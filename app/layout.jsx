@@ -1,5 +1,6 @@
 import '@fontsource/ibm-plex-sans'
 import '@fontsource/ibm-plex-sans/600.css'
+import './globals.css'
 import DemoReset from '@/components/DemoReset'
 
 export default function RootLayout({ children }) {
