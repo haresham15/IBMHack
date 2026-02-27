@@ -19,6 +19,8 @@ function isThisWeek(dateStr) {
 
 function sortTasks(tasks) {
   return [...tasks].sort((a, b) => {
+    // Completed tasks always go last
+    if (a.completed !== b.completed) return a.completed ? 1 : -1
     if (!a.dueDate && !b.dueDate) return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
     if (!a.dueDate) return 1
     if (!b.dueDate) return -1
@@ -73,9 +75,29 @@ export default function SyllabusPage() {
   const importantDates = syllabus?.importantDates || []
   const policies = syllabus?.policies || null
 
+  if (tasks.length === 0) {
+    return (
+      <>
+        <Navbar showNav={true} />
+        <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📂</div>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#161616', marginBottom: '8px' }}>No tasks found</h2>
+            <p style={{ color: '#525252', fontSize: '14px', marginBottom: '24px' }}>Upload a syllabus to generate your personalised task list.</p>
+            <a href="/upload" style={{
+              backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
+              borderRadius: '8px', padding: '12px 24px', fontSize: '15px',
+              fontWeight: '600', textDecoration: 'none', display: 'inline-block'
+            }}>Upload a Syllabus</a>
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar showNav={true} />
       <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4' }}>
         {/* Header */}
         <div style={{
