@@ -39,7 +39,7 @@ const genRes = await fetch(`${WATSONX_URL}/ml/v1/text/generation?version=2023-05
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    model_id: 'ibm/granite-13b-instruct-v2',
+    model_id: 'ibm/granite-3-8b-instruct',
     input: '<|system|>\nYou are a helpful assistant.\n<|user|>\nSay hello in one sentence.\n<|assistant|>',
     parameters: { max_new_tokens: 50, temperature: 0.1 },
     project_id: WATSONX_PROJECT_ID
