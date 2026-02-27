@@ -37,12 +37,13 @@ export async function POST(request) {
   const arrayBuffer = await file.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
 
-  // Extract text with pdf-parse (dynamic import — avoids bundler issues)
+  // Extract text with pdf-parse v2 class API (dynamic import — avoids bundler issues)
   let rawText
   try {
-    const { default: pdfParse } = await import('pdf-parse')
-    const parsed = await pdfParse(buffer)
-    rawText = parsed.text ?? ''
+    const { PDFParse } = await import('pdf-parse')
+    const parser = new PDFParse({ data: buffer })
+    const textResult = await parser.getText()
+    rawText = textResult.text ?? ''
   } catch (err) {
     return Response.json(
       { error: true, code: 'UPLOAD_FAILED', message: `PDF text extraction failed: ${err.message}` },
