@@ -66,7 +66,7 @@ export default function DashboardPage() {
     const s = localStorage.getItem('vantage_syllabi')
     if (s) setSyllabi(JSON.parse(s))
 
-    fetch('/api/agent').then(r => r.json()).then(setAlert).catch(() => {})
+    fetch('/api/agent').then(r => r.json()).then(setAlert).catch(() => { })
   }, [router])
 
   function handleComplete(id) {
@@ -123,7 +123,7 @@ export default function DashboardPage() {
               <div style={{ color: '#525252', marginBottom: '24px' }}>
                 Vantage will turn it into a personalised task list.
               </div>
-              <button onClick={() => router.push('/upload')} style={{
+              <button aria-label="Navigate to upload a syllabus page" onClick={() => router.push('/upload')} style={{
                 backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
                 borderRadius: '8px', padding: '12px 28px', fontSize: '15px',
                 fontWeight: '600', cursor: 'pointer'
@@ -133,7 +133,7 @@ export default function DashboardPage() {
             <>
               {/* Upcoming Tasks */}
               <div style={{ marginBottom: '32px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#0F62FE' }}>
                     Upcoming Tasks
                   </h2>
@@ -142,6 +142,10 @@ export default function DashboardPage() {
                     borderRadius: '12px', padding: '2px 10px',
                     fontWeight: 'bold', fontSize: '13px'
                   }}>{filteredTasks.length}</span>
+                </div>
+                <div style={{ fontSize: '13px', color: '#525252', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#198038' }} />
+                  Filtered to your {capProfile.timeHorizon} time horizon
                 </div>
 
                 {filteredTasks.length === 0 ? (
@@ -173,7 +177,11 @@ export default function DashboardPage() {
                 {syllabi.map(s => (
                   <div
                     key={s.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View parsed tasks for ${s.courseName}`}
                     onClick={() => router.push(`/syllabus/${s.id}`)}
+                    onKeyDown={e => { if (e.key === 'Enter') router.push(`/syllabus/${s.id}`) }}
                     onMouseEnter={() => setHoveredSyllabus(s.id)}
                     onMouseLeave={() => setHoveredSyllabus(null)}
                     style={{

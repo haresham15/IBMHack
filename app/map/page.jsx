@@ -4,12 +4,16 @@ import Navbar from '@/components/Navbar'
 
 // Mock Data for MVP Campus Map
 const MAP_LOCATIONS = [
-    { id: 'dreese', name: 'Dreese Labs', type: 'Academic', noiseLevel: 'High', occupancy: '85%', safeSpace: false },
+    { id: 'dreese', name: 'Dreese Labs (3rd Floor)', type: 'Academic', noiseLevel: 'Low', occupancy: '15%', safeSpace: true },
     { id: 'thompson', name: 'Thompson Lib (11th Fl)', type: 'Library', noiseLevel: 'Silent', occupancy: '40%', safeSpace: true },
-    { id: 'union', name: 'Student Union', type: 'Social', noiseLevel: 'Overwhelming', occupancy: '98%', safeSpace: false },
-    { id: 'rpac', name: 'RPAC Lounge', type: 'Recreation', noiseLevel: 'Moderate', occupancy: '60%', safeSpace: false },
+    { id: 'thompson-ground', name: 'Thompson Lib (Ground)', type: 'Library', noiseLevel: 'High', occupancy: '90%', safeSpace: false },
+    { id: 'union', name: 'Student Union Lounge', type: 'Social', noiseLevel: 'Overwhelming', occupancy: '98%', safeSpace: false },
+    { id: 'rpac', name: 'RPAC Cafe', type: 'Recreation', noiseLevel: 'Moderate', occupancy: '60%', safeSpace: false },
     { id: '18th', name: '18th Ave Lib (Basement)', type: 'Library', noiseLevel: 'Silent', occupancy: '35%', safeSpace: true },
-    { id: 'younkin', name: 'Younkin Success Center', type: 'Support', noiseLevel: 'Low', occupancy: '25%', safeSpace: true }
+    { id: 'younkin', name: 'Younkin Success Center', type: 'Support', noiseLevel: 'Low', occupancy: '25%', safeSpace: true },
+    { id: 'knowlton', name: 'Knowlton Hall (Roof Garden)', type: 'Outdoor', noiseLevel: 'Silent', occupancy: '10%', safeSpace: true },
+    { id: 'pomerene', name: 'Pomerene Hall Atrium', type: 'Academic', noiseLevel: 'Moderate', occupancy: '45%', safeSpace: false },
+    { id: 'scott', name: 'Scott Dining Hall', type: 'Dining', noiseLevel: 'High', occupancy: '85%', safeSpace: false }
 ]
 
 export default function CampusMapPage() {
@@ -53,6 +57,24 @@ export default function CampusMapPage() {
                         <p style={{ color: '#525252', fontSize: '15px', lineHeight: 1.6, maxWidth: '600px' }}>
                             Real-time sensory tracking across campus. Based on public class schedules and student-contributed check-ins. <strong style={{ color: '#0F62FE' }}>Phase 2 will introduce live Wi-Fi density integration.</strong>
                         </p>
+                    </div>
+
+                    {/* Time Context Banner */}
+                    <div style={{
+                        backgroundColor: '#E5F6FF',
+                        border: '1px solid #BAE6FF',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        marginBottom: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        color: '#0043CE',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                    }}>
+                        <span style={{ fontSize: '18px' }}>🕒</span>
+                        Currently viewing estimated occupancy for: <strong>Tuesday, 2:15 PM</strong>
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>

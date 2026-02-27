@@ -20,7 +20,12 @@ export default function AgentAlert({ alert, onAction }) {
         animation: alert.urgent ? 'pulse-glow 2s infinite' : 'none'
       }}>
         <span style={{ fontSize: '24px' }}>🔔</span>
-        <span style={{ fontSize: '15px', flex: 1 }}>{alert.message}</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px', opacity: 0.8 }}>
+            Trigger: Critical Deadline in CAP Horizon
+          </div>
+          <span style={{ fontSize: '15px' }}>{alert.message}</span>
+        </div>
         {alert.cta && (
           <button
             onClick={onAction}

@@ -10,7 +10,7 @@ export default function Navbar({ showNav = true }) {
       justifyContent: 'space-between', padding: '0 24px', zIndex: 100
     }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-        <span style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '20px' }}>Vantage</span>
+        <span aria-label="Vantage Home" style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '20px' }}>Vantage</span>
         <span style={{ color: '#93C5FD', fontSize: '13px' }}>AI for Every Brain</span>
       </div>
       <div style={{ display: 'flex', gap: '24px' }}>
