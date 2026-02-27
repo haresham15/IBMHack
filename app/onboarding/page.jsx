@@ -139,7 +139,7 @@ export default function OnboardingPage() {
                 backgroundColor: m.role === 'user' ? '#0F62FE' : '#F4F4F4',
                 color: m.role === 'user' ? '#FFFFFF' : '#161616',
                 borderRadius: m.role === 'user' ? '12px 12px 0 12px' : '12px 12px 12px 0',
-                padding: '12px 16px', maxWidth: '75%', fontSize: '15px', lineHeight: 1.5
+                padding: '16px', maxWidth: '75%', fontSize: '15px', lineHeight: 1.5
               }}>{m.text}</div>
             </div>
           ))}
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
               borderRadius: '12px 12px 12px 0', width: 'fit-content', animation: 'fadeIn 200ms ease' }}>
               {[0,1,2].map(i => (
                 <div key={i} style={{
-                  width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#525252',
+                  width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0F62FE',
                   animation: `dot-pulse 1.2s ease-in-out ${i * 0.2}s infinite`
                 }} />
               ))}

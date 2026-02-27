@@ -226,6 +226,11 @@ export default function UploadPage() {
           }}>
           ✨ Analyse with Vantage
         </button>
+
+        {/* IBM Footer */}
+        <div style={{ textAlign: 'center', color: '#525252', fontSize: '11px', padding: '12px', borderTop: '1px solid #E0E0E0', marginTop: '40px' }}>
+          Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
+        </div>
       </div>
     </>
   )

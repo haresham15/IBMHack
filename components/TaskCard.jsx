@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 const PRIORITY_COLORS = {
   high: '#DA1E28',
-  medium: '#B28600',
+  medium: '#7D5A00', // darkened for AA contrast with white text
   low: '#198038'
 }
 
@@ -17,9 +17,9 @@ function formatTime(minutes) {
   if (!minutes) return ''
   if (minutes >= 60) {
     const hrs = Math.round(minutes / 30) / 2
-    return `${hrs} hr`
+    return `~${hrs} hr`
   }
-  return `${minutes} min`
+  return `~${minutes} min`
 }
 
 export default function TaskCard({ task, onComplete }) {
@@ -38,7 +38,7 @@ export default function TaskCard({ task, onComplete }) {
         padding: '16px',
         marginBottom: '12px',
         boxShadow: hovered
-          ? '0 6px 20px rgba(0,0,0,0.15)'
+          ? '0 4px 16px rgba(0,0,0,0.12)'
           : '0 2px 8px rgba(0,0,0,0.08)',
         transform: hovered ? 'translateY(-2px)' : 'none',
         transition: 'transform 150ms ease, box-shadow 150ms ease',
@@ -68,7 +68,7 @@ export default function TaskCard({ task, onComplete }) {
       </div>
 
       {/* Row 2: Description */}
-      <p style={{ color: '#525252', fontSize: '14px', lineHeight: 1.6, margin: '0 0 10px 0' }}>
+      <p style={{ color: '#525252', fontSize: '15px', lineHeight: 1.65, margin: '0 0 10px 0' }}>
         {task.plainEnglishDescription}
       </p>
 
@@ -81,7 +81,7 @@ export default function TaskCard({ task, onComplete }) {
             {stepsOpen ? '▾ Hide steps' : '▸ Show steps'}
           </button>
           {stepsOpen && (
-            <ol style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#525252', fontSize: '13px', lineHeight: 1.7 }}>
+            <ol style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#525252', fontSize: '14px', lineHeight: 1.5 }}>
               {task.steps.map((s, i) => <li key={i}>{s}</li>)}
             </ol>
           )}
