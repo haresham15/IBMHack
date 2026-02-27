@@ -5,23 +5,32 @@ import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
 
 const FILTERS = ['All', 'Due This Week', 'High Priority']
+const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 }
 
 function isThisWeek(dateStr) {
   if (!dateStr) return false
   const d = new Date(dateStr + 'T00:00:00')
   const now = new Date()
+  now.setHours(0, 0, 0, 0)
   const week = new Date(now)
   week.setDate(now.getDate() + 7)
   return d >= now && d <= week
 }
 
-function sortByDue(tasks) {
+function sortTasks(tasks) {
   return [...tasks].sort((a, b) => {
-    if (!a.dueDate && !b.dueDate) return 0
+    if (!a.dueDate && !b.dueDate) return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
     if (!a.dueDate) return 1
     if (!b.dueDate) return -1
-    return new Date(a.dueDate) - new Date(b.dueDate)
+    const diff = new Date(a.dueDate) - new Date(b.dueDate)
+    if (diff !== 0) return diff
+    return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
   })
+}
+
+function formatEventDate(dateStr) {
+  if (!dateStr) return ''
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 export default function SyllabusPage() {
@@ -55,11 +64,14 @@ export default function SyllabusPage() {
 
   const tasksWithCompleted = tasks.map(t => ({ ...t, completed: completed.includes(t.id) }))
 
-  const filtered = sortByDue(tasksWithCompleted.filter(t => {
+  const filtered = sortTasks(tasksWithCompleted.filter(t => {
     if (activeFilter === 'Due This Week') return isThisWeek(t.dueDate)
     if (activeFilter === 'High Priority') return t.priority === 'high'
     return true
   }))
+
+  const importantDates = syllabus?.importantDates || []
+  const policies = syllabus?.policies || null
 
   return (
     <>
@@ -68,20 +80,21 @@ export default function SyllabusPage() {
         {/* Header */}
         <div style={{
           background: 'linear-gradient(135deg, #0F62FE, #001D6C)',
-          padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
+          padding: '28px 32px', minHeight: '80px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
           <div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFFFFF' }}>
+            <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#FFFFFF' }}>
               {syllabus?.courseName || 'Course Syllabus'}
             </div>
             <div style={{ fontSize: '14px', color: '#93C5FD', marginTop: '4px' }}>
-              {syllabus?.instructor} {syllabus?.term ? `• ${syllabus.term}` : ''}
+              {[syllabus?.instructor, syllabus?.term].filter(Boolean).join(' • ')}
             </div>
           </div>
           <a href={`/api/syllabus/${id}/original`} target="_blank" rel="noreferrer"
             style={{
               backgroundColor: '#FFFFFF', color: '#0F62FE',
-              border: 'none', borderRadius: '6px', padding: '8px 16px',
+              border: '1px solid #0F62FE', borderRadius: '6px', padding: '8px 16px',
               fontSize: '14px', fontWeight: '600', textDecoration: 'none',
               display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
             }}>
@@ -103,7 +116,7 @@ export default function SyllabusPage() {
 
         {/* Tasks grid */}
         <div style={{
-          maxWidth: '900px', margin: '0 auto', padding: '24px',
+          maxWidth: '960px', margin: '0 auto', padding: '24px',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
           gap: '16px'
@@ -118,31 +131,51 @@ export default function SyllabusPage() {
           )}
         </div>
 
-        {/* Policies section */}
-        {syllabus?.policies && (
-          <div style={{ maxWidth: '900px', margin: '0 auto 32px', padding: '0 24px' }}>
+        {/* Important Dates */}
+        {importantDates.length > 0 && (
+          <div style={{ maxWidth: '960px', margin: '0 auto 24px', padding: '0 24px' }}>
+            <h3 style={{ fontSize: '16px', color: '#161616', marginBottom: '12px' }}>Important Dates</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {importantDates.map((d, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0F62FE', flexShrink: 0 }} />
+                  <span style={{ color: '#525252', fontSize: '14px', fontWeight: '600', minWidth: '70px' }}>{formatEventDate(d.date)}</span>
+                  <span style={{ color: '#161616', fontSize: '14px' }}>{d.event}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Policies */}
+        {policies && (policies.attendance || policies.lateWork) && (
+          <div style={{ maxWidth: '960px', margin: '0 auto 32px', padding: '0 24px' }}>
             <div style={{
               backgroundColor: '#F4F4F4', borderRadius: '8px', padding: '20px',
               border: '1px solid #E0E0E0'
             }}>
               <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#161616' }}>Course Policies</h3>
-              {syllabus.policies.attendance && (
-                <p style={{ margin: '0 0 6px', fontSize: '14px', color: '#525252' }}>
-                  <strong>Attendance:</strong> {syllabus.policies.attendance}
-                </p>
-              )}
-              {syllabus.policies.lateWork && (
-                <p style={{ margin: 0, fontSize: '14px', color: '#525252' }}>
-                  <strong>Late Work:</strong> {syllabus.policies.lateWork}
-                </p>
-              )}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                {policies.attendance && (
+                  <div>
+                    <div style={{ fontWeight: '600', fontSize: '13px', color: '#525252', marginBottom: '4px' }}>Attendance</div>
+                    <div style={{ fontSize: '14px', color: '#161616' }}>{policies.attendance}</div>
+                  </div>
+                )}
+                {policies.lateWork && (
+                  <div>
+                    <div style={{ fontWeight: '600', fontSize: '13px', color: '#525252', marginBottom: '4px' }}>Late Work</div>
+                    <div style={{ fontSize: '14px', color: '#161616' }}>{policies.lateWork}</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', color: '#525252', fontSize: '12px', padding: '16px', borderTop: '1px solid #E0E0E0' }}>
-          Powered by IBM Granite and WatsonX • IBM SkillsBuild Hackathon 2025
+        <div style={{ textAlign: 'center', color: '#525252', fontSize: '11px', padding: '16px', borderTop: '1px solid #E0E0E0' }}>
+          Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
         </div>
       </div>
     </>

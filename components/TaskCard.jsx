@@ -7,6 +7,8 @@ const PRIORITY_COLORS = {
   low: '#198038'
 }
 
+const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 }
+
 function formatDueDate(dueDate) {
   if (!dueDate) return 'Due date TBD'
   const d = new Date(dueDate + 'T00:00:00')
@@ -16,11 +18,13 @@ function formatDueDate(dueDate) {
 function formatTime(minutes) {
   if (!minutes) return ''
   if (minutes >= 60) {
-    const hrs = Math.round(minutes / 30) / 2
-    return `${hrs} hr`
+    const hrs = Math.round(minutes / 10) / 6
+    return `~${Math.round(hrs * 10) / 10} hr`
   }
-  return `${minutes} min`
+  return `~${minutes} min`
 }
+
+export { PRIORITY_ORDER }
 
 export default function TaskCard({ task, onComplete }) {
   const [stepsOpen, setStepsOpen] = useState(false)
@@ -38,7 +42,7 @@ export default function TaskCard({ task, onComplete }) {
         padding: '16px',
         marginBottom: '12px',
         boxShadow: hovered
-          ? '0 6px 20px rgba(0,0,0,0.15)'
+          ? '0 4px 16px rgba(0,0,0,0.12)'
           : '0 2px 8px rgba(0,0,0,0.08)',
         transform: hovered ? 'translateY(-2px)' : 'none',
         transition: 'transform 150ms ease, box-shadow 150ms ease',
@@ -50,7 +54,7 @@ export default function TaskCard({ task, onComplete }) {
         type="checkbox"
         checked={!!task.completed}
         onChange={() => onComplete && onComplete(task.id)}
-        style={{ position: 'absolute', top: '16px', right: '16px', width: '18px', height: '18px', cursor: 'pointer' }}
+        style={{ position: 'absolute', top: '16px', right: '16px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#0F62FE' }}
       />
 
       {/* Row 1: Title + Badge */}
@@ -68,11 +72,11 @@ export default function TaskCard({ task, onComplete }) {
       </div>
 
       {/* Row 2: Description */}
-      <p style={{ color: '#525252', fontSize: '14px', lineHeight: 1.6, margin: '0 0 10px 0' }}>
+      <p style={{ color: '#525252', fontSize: '15px', lineHeight: 1.65, margin: '0 0 10px 0' }}>
         {task.plainEnglishDescription}
       </p>
 
-      {/* Row 3: Steps */}
+      {/* Row 3: Steps — animated collapse */}
       {task.steps && task.steps.length > 0 && (
         <div style={{ marginBottom: '10px' }}>
           <button
@@ -80,11 +84,15 @@ export default function TaskCard({ task, onComplete }) {
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0F62FE', fontSize: '13px', padding: 0 }}>
             {stepsOpen ? '▾ Hide steps' : '▸ Show steps'}
           </button>
-          {stepsOpen && (
-            <ol style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#525252', fontSize: '13px', lineHeight: 1.7 }}>
+          <div style={{
+            maxHeight: stepsOpen ? '500px' : '0',
+            overflow: 'hidden',
+            transition: 'max-height 300ms ease'
+          }}>
+            <ol style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#525252', fontSize: '14px', lineHeight: 1.5 }}>
               {task.steps.map((s, i) => <li key={i}>{s}</li>)}
             </ol>
-          )}
+          </div>
         </div>
       )}
 

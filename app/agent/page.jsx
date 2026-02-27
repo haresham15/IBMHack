@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
@@ -11,9 +11,14 @@ export default function AgentPage() {
   const [responses, setResponses] = useState({ studentId: '', gradYear: '', financialChange: '' })
   const [textInput, setTextInput] = useState('')
 
+  // Restore text input when going back to step 1
+  useEffect(() => {
+    if (step === 1) setTextInput(responses.studentId)
+    else setTextInput('')
+  }, [step, responses.studentId])
+
   function handleNext(field, value) {
     if (field) setResponses(r => ({ ...r, [field]: value }))
-    setTextInput('')
     setStep(s => s + 1)
   }
 
@@ -23,18 +28,17 @@ export default function AgentPage() {
 
   function downloadSummary() {
     const content = [
-      'FAFSA Verification Form — Vantage Summary',
-      '==========================================',
-      `Student ID: ${responses.studentId}`,
-      `Expected Graduation Year: ${responses.gradYear}`,
-      `Financial Situation Change: ${responses.financialChange}`,
+      'VANTAGE FORM SUMMARY',
+      `Generated: ${new Date().toLocaleString()}`,
       '',
-      `Generated: ${new Date().toLocaleString()}`
+      `Student ID: ${responses.studentId}`,
+      `Graduation Year: ${responses.gradYear}`,
+      `Financial Situation Change: ${responses.financialChange}`
     ].join('\n')
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = 'vantage-fafsa-summary.txt'; a.click()
+    a.href = url; a.download = 'vantage-form-summary.txt'; a.click()
     URL.revokeObjectURL(url)
   }
 
@@ -62,7 +66,6 @@ export default function AgentPage() {
             </div>
           </div>
 
-          {/* Chat-style layout */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
             {/* Step 0 */}
@@ -115,7 +118,9 @@ export default function AgentPage() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {['2025', '2026', '2027', '2028'].map(y => (
                     <button key={y} onClick={() => handleNext('gradYear', y)} style={{
-                      border: '2px solid #0F62FE', color: '#0F62FE', backgroundColor: '#FFFFFF',
+                      border: `2px solid ${responses.gradYear === y ? '#0F62FE' : '#0F62FE'}`,
+                      backgroundColor: responses.gradYear === y ? '#0F62FE' : '#FFFFFF',
+                      color: responses.gradYear === y ? '#FFFFFF' : '#0F62FE',
                       borderRadius: '20px', padding: '8px 20px', cursor: 'pointer', fontSize: '14px'
                     }}>{y}</button>
                   ))}
@@ -134,7 +139,9 @@ export default function AgentPage() {
                 <div style={{ display: 'flex', gap: '8px' }}>
                   {['Yes', 'No'].map(opt => (
                     <button key={opt} onClick={() => handleNext('financialChange', opt)} style={{
-                      border: '2px solid #0F62FE', color: '#0F62FE', backgroundColor: '#FFFFFF',
+                      border: '2px solid #0F62FE',
+                      backgroundColor: responses.financialChange === opt ? '#0F62FE' : '#FFFFFF',
+                      color: responses.financialChange === opt ? '#FFFFFF' : '#0F62FE',
                       borderRadius: '20px', padding: '8px 24px', cursor: 'pointer', fontSize: '14px'
                     }}>{opt}</button>
                   ))}
