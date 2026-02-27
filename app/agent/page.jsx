@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import { jsPDF } from 'jspdf'
 
 const TOTAL_STEPS = 4
 
@@ -27,19 +28,19 @@ export default function AgentPage() {
   }
 
   function downloadSummary() {
-    const content = [
-      'VANTAGE FORM SUMMARY',
-      `Generated: ${new Date().toLocaleString()}`,
-      '',
-      `Student ID: ${responses.studentId}`,
-      `Graduation Year: ${responses.gradYear}`,
-      `Financial Situation Change: ${responses.financialChange}`
-    ].join('\n')
-    const blob = new Blob([content], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = 'vantage-form-summary.txt'; a.click()
-    URL.revokeObjectURL(url)
+    const doc = new jsPDF()
+
+    doc.setFontSize(16)
+    doc.text('VANTAGE FORM SUMMARY', 20, 20)
+
+    doc.setFontSize(12)
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 30)
+
+    doc.text(`Student ID: ${responses.studentId}`, 20, 50)
+    doc.text(`Expected Graduation Year: ${responses.gradYear}`, 20, 60)
+    doc.text(`Financial Situation Change: ${responses.financialChange}`, 20, 70)
+
+    doc.save('vantage-FAFSA-summary.pdf')
   }
 
   return (
