@@ -2,22 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-*, *::before, *::after {
-  box-sizing: border-box;
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'IBM Plex Sans', Arial, sans-serif;
-  background: #F4F4F4;
-  color: #161616;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-a { color: inherit; }
-
-button { font-family: inherit; }
-
-input, textarea, select { font-family: inherit; }
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
