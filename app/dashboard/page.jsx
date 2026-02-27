@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import AgentAlert from '@/components/AgentAlert'
 import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
+import { createClient } from '@/lib/supabase/client'
 
 function timeOfDay() {
   const h = new Date().getHours()
@@ -25,7 +26,7 @@ function filterByTimeHorizon(tasks, timeHorizon) {
   return tasks.filter(t => {
     if (!t.dueDate) return true
     const due = new Date(t.dueDate + 'T00:00:00')
-    return due <= cutoff // includes overdue
+    return due <= cutoff
   })
 }
 
@@ -48,39 +49,99 @@ export default function DashboardPage() {
   const [capProfile, setCapProfile] = useState(null)
   const [alert, setAlert] = useState(null)
   const [tasks, setTasks] = useState([])
-  const [completed, setCompleted] = useState([])
   const [syllabi, setSyllabi] = useState([])
   const [hoveredSyllabus, setHoveredSyllabus] = useState(null)
 
   useEffect(() => {
-    const cap = localStorage.getItem('vantage_cap')
-    if (!cap) { router.push('/onboarding'); return }
-    setCapProfile(JSON.parse(cap))
+    const supabase = createClient()
 
-    const t = localStorage.getItem('vantage_tasks')
-    if (t) setTasks(JSON.parse(t))
+    async function loadData() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/'); return }
 
-    const c = localStorage.getItem('vantage_completed')
-    if (c) setCompleted(JSON.parse(c))
+      // Load CAP profile
+      const { data: cap } = await supabase
+        .from('cap_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
 
-    const s = localStorage.getItem('vantage_syllabi')
-    if (s) setSyllabi(JSON.parse(s))
+      if (!cap) { router.push('/onboarding'); return }
 
-    fetch('/api/agent').then(r => r.json()).then(setAlert).catch(() => { })
+      setCapProfile({
+        displayName: cap.display_name,
+        informationDensity: cap.information_density,
+        timeHorizon: cap.time_horizon,
+        sensoryFlags: cap.sensory_flags,
+        supportLevel: cap.support_level
+      })
+
+      // Load syllabi
+      const { data: syllabusRows } = await supabase
+        .from('syllabi')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('uploaded_at', { ascending: false })
+
+      if (syllabusRows) {
+        setSyllabi(syllabusRows.map(s => ({
+          id: s.id,
+          courseName: s.course_name,
+          instructor: s.instructor,
+          term: s.term,
+          uploadedAt: s.uploaded_at
+        })))
+
+        // Load tasks for all syllabi
+        const syllabusIds = syllabusRows.map(s => s.id)
+        if (syllabusIds.length > 0) {
+          const { data: taskRows } = await supabase
+            .from('tasks')
+            .select('*')
+            .in('syllabus_id', syllabusIds)
+
+          if (taskRows) {
+            setTasks(taskRows.map(t => ({
+              id: t.id,
+              syllabusId: t.syllabus_id,
+              title: t.title,
+              plainEnglishDescription: t.plain_english_description,
+              dueDate: t.due_date,
+              priority: t.priority,
+              estimatedMinutes: t.estimated_minutes,
+              confidence: t.confidence,
+              steps: t.steps,
+              type: t.type,
+              completed: t.completed
+            })))
+          }
+        }
+      }
+
+      fetch('/api/agent').then(r => r.json()).then(setAlert).catch(() => { })
+    }
+
+    loadData()
   }, [router])
 
-  function handleComplete(id) {
-    const next = completed.includes(id)
-      ? completed.filter(c => c !== id)
-      : [...completed, id]
-    setCompleted(next)
-    localStorage.setItem('vantage_completed', JSON.stringify(next))
+  async function handleComplete(id) {
+    const supabase = createClient()
+    const task = tasks.find(t => t.id === id)
+    if (!task) return
+    const next = !task.completed
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: next } : t))
+    await supabase.from('tasks').update({ completed: next }).eq('id', id)
+  }
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/')
   }
 
   if (!capProfile) return null
 
-  const tasksWithCompleted = tasks.map(t => ({ ...t, completed: completed.includes(t.id) }))
-  const filteredTasks = sortByDue(filterByTimeHorizon(tasksWithCompleted, capProfile.timeHorizon))
+  const filteredTasks = sortByDue(filterByTimeHorizon(tasks, capProfile.timeHorizon))
 
   return (
     <>
@@ -92,12 +153,32 @@ export default function DashboardPage() {
           background: 'linear-gradient(135deg, #0F62FE, #001D6C)',
           color: '#FFFFFF',
           padding: '28px 32px',
-          borderRadius: '0 0 12px 12px'
+          borderRadius: '0 0 12px 12px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
-          <div style={{ fontSize: '28px', fontWeight: 'bold' }}>
-            Good {timeOfDay()}, {capProfile.displayName}.
+          <div>
+            <div style={{ fontSize: '28px', fontWeight: 'bold' }}>
+              Good {timeOfDay()}, {capProfile.displayName}.
+            </div>
+            <div style={{ fontSize: '14px', color: '#93C5FD', marginTop: '4px' }}>{formatDate()}</div>
           </div>
-          <div style={{ fontSize: '14px', color: '#93C5FD', marginTop: '4px' }}>{formatDate()}</div>
+          <button
+            onClick={handleSignOut}
+            style={{
+              background: 'rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: '#FFFFFF',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: '500'
+            }}
+          >
+            Sign out
+          </button>
         </div>
 
         <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px' }}>
@@ -116,7 +197,7 @@ export default function DashboardPage() {
               padding: '56px 48px', textAlign: 'center',
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}>
-              <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎓</div>
+              <div style={{ fontSize: '56px', marginBottom: '16px' }}>&#x1F393;</div>
               <div style={{ fontWeight: 'bold', fontSize: '18px', color: '#161616', marginBottom: '12px' }}>
                 Upload your first syllabus
               </div>
@@ -154,7 +235,7 @@ export default function DashboardPage() {
                     padding: '32px', textAlign: 'center', color: '#525252',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
                   }}>
-                    No tasks due in your current time window. 🎉
+                    No tasks due in your current time window. &#x1F389;
                   </div>
                 ) : (
                   <div style={{
@@ -208,7 +289,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <span style={{ color: '#0F62FE', fontSize: '14px', fontWeight: '600', whiteSpace: 'nowrap' }}>
-                      → View
+                      &#x2192; View
                     </span>
                   </div>
                 ))}

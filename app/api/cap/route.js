@@ -1,4 +1,5 @@
 import { buildCAP } from '@/lib/cap/engine'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request) {
   let body
@@ -30,14 +31,40 @@ export async function POST(request) {
     )
   }
 
+  // Save to Supabase
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return Response.json(
+      { error: true, code: 'UNAUTHORIZED', message: 'Not authenticated.' },
+      { status: 401 }
+    )
+  }
+
+  const { error: dbError } = await supabase.from('cap_profiles').upsert({
+    user_id: user.id,
+    display_name: capResult.displayName,
+    information_density: capResult.informationDensity,
+    time_horizon: capResult.timeHorizon,
+    sensory_flags: capResult.sensoryFlags,
+    support_level: capResult.supportLevel
+  }, { onConflict: 'user_id' })
+
+  if (dbError) {
+    return Response.json(
+      { error: true, code: 'DB_ERROR', message: dbError.message },
+      { status: 500 }
+    )
+  }
+
   return Response.json({
     capProfile: {
       displayName: capResult.displayName,
       informationDensity: capResult.informationDensity,
       timeHorizon: capResult.timeHorizon,
       sensoryFlags: capResult.sensoryFlags,
-      supportLevel: capResult.supportLevel,
-      sessionId: crypto.randomUUID()
+      supportLevel: capResult.supportLevel
     }
   })
 }

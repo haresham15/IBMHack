@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
+import { createClient } from '@/lib/supabase/client'
 
 const FILTERS = ['All', 'Due This Week', 'High Priority']
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 }
@@ -18,7 +19,6 @@ function isThisWeek(dateStr) {
 
 function sortByDue(tasks) {
   return [...tasks].sort((a, b) => {
-    // Completed tasks always go last
     if (a.completed !== b.completed) return a.completed ? 1 : -1
     if (!a.dueDate && !b.dueDate) return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
     if (!a.dueDate) return 1
@@ -31,41 +31,70 @@ export default function SyllabusPage() {
   const { id } = useParams()
   const [tasks, setTasks] = useState([])
   const [syllabus, setSyllabus] = useState(null)
-  const [completed, setCompleted] = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const t = localStorage.getItem('vantage_tasks')
-    if (t) setTasks(JSON.parse(t))
+    const supabase = createClient()
 
-    const c = localStorage.getItem('vantage_completed')
-    if (c) setCompleted(JSON.parse(c))
+    async function loadData() {
+      const { data: sylRow } = await supabase
+        .from('syllabi')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle()
 
-    const s = localStorage.getItem('vantage_syllabi')
-    if (s) {
-      const all = JSON.parse(s)
-      setSyllabus(all.find(x => x.id === id) || null)
+      if (sylRow) {
+        setSyllabus({
+          id: sylRow.id,
+          courseName: sylRow.course_name,
+          instructor: sylRow.instructor,
+          term: sylRow.term
+        })
+      }
+
+      const { data: taskRows } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('syllabus_id', id)
+
+      if (taskRows) {
+        setTasks(taskRows.map(t => ({
+          id: t.id,
+          title: t.title,
+          plainEnglishDescription: t.plain_english_description,
+          dueDate: t.due_date,
+          priority: t.priority,
+          estimatedMinutes: t.estimated_minutes,
+          confidence: t.confidence,
+          steps: t.steps,
+          type: t.type,
+          completed: t.completed
+        })))
+      }
+
+      setLoading(false)
     }
+
+    loadData()
   }, [id])
 
-  function handleComplete(tid) {
-    const next = completed.includes(tid)
-      ? completed.filter(c => c !== tid)
-      : [...completed, tid]
-    setCompleted(next)
-    localStorage.setItem('vantage_completed', JSON.stringify(next))
+  async function handleComplete(tid) {
+    const supabase = createClient()
+    const task = tasks.find(t => t.id === tid)
+    if (!task) return
+    const next = !task.completed
+    setTasks(prev => prev.map(t => t.id === tid ? { ...t, completed: next } : t))
+    await supabase.from('tasks').update({ completed: next }).eq('id', tid)
   }
 
-  const tasksWithCompleted = tasks.map(t => ({ ...t, completed: completed.includes(t.id) }))
-
-  const filtered = sortByDue(tasksWithCompleted.filter(t => {
+  const filtered = sortByDue(tasks.filter(t => {
     if (activeFilter === 'Due This Week') return isThisWeek(t.dueDate)
     if (activeFilter === 'High Priority') return t.priority === 'high'
     return true
   }))
 
-  const importantDates = syllabus?.importantDates || []
-  const policies = syllabus?.policies || null
+  if (loading) return null
 
   if (tasks.length === 0) {
     return (
@@ -73,7 +102,7 @@ export default function SyllabusPage() {
         <Navbar showNav={true} />
         <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center', padding: '40px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📂</div>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>&#x1F4C2;</div>
             <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#161616', marginBottom: '8px' }}>No tasks found</h2>
             <p style={{ color: '#525252', fontSize: '14px', marginBottom: '24px' }}>Upload a syllabus to generate your personalised task list.</p>
             <a href="/upload" style={{
@@ -111,7 +140,7 @@ export default function SyllabusPage() {
               fontSize: '14px', fontWeight: '600', textDecoration: 'none',
               display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
             }}>
-            🔗 View Original PDF
+            &#x1F517; View Original PDF
           </a>
         </div>
 
@@ -143,43 +172,6 @@ export default function SyllabusPage() {
             </div>
           )}
         </div>
-
-        {/* Important Dates */}
-        {importantDates.length > 0 && (
-          <div style={{ maxWidth: '900px', margin: '0 auto 24px', padding: '0 24px' }}>
-            <h3 style={{ fontSize: '16px', color: '#161616', marginBottom: '12px' }}>Important Dates</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {importantDates.map((d, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0F62FE', flexShrink: 0 }} />
-                  <span style={{ color: '#525252', fontSize: '14px', fontWeight: '600', minWidth: '70px' }}>
-                    {new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
-                  <span style={{ color: '#161616', fontSize: '14px' }}>{d.event}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Policies */}
-        {policies && (
-          <div style={{ maxWidth: '900px', margin: '0 auto 32px', padding: '0 24px' }}>
-            <div style={{ backgroundColor: '#F4F4F4', borderRadius: '8px', padding: '20px', border: '1px solid #E0E0E0' }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#161616' }}>Course Policies</h3>
-              {policies.attendance && (
-                <p style={{ margin: '0 0 6px', fontSize: '14px', color: '#525252' }}>
-                  <strong>Attendance:</strong> {policies.attendance}
-                </p>
-              )}
-              {policies.lateWork && (
-                <p style={{ margin: 0, fontSize: '14px', color: '#525252' }}>
-                  <strong>Late Work:</strong> {policies.lateWork}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Footer */}
         <div style={{ textAlign: 'center', color: '#525252', fontSize: '12px', padding: '16px', borderTop: '1px solid #E0E0E0' }}>
