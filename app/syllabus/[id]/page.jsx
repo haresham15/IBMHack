@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
+import { createClient } from '@/lib/supabase/client'
 
 const FILTERS = ['All', 'Due This Week', 'High Priority']
 const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 }
@@ -11,94 +12,135 @@ function isThisWeek(dateStr) {
   if (!dateStr) return false
   const d = new Date(dateStr + 'T00:00:00')
   const now = new Date()
-  now.setHours(0, 0, 0, 0)
   const week = new Date(now)
   week.setDate(now.getDate() + 7)
   return d >= now && d <= week
 }
 
-function sortTasks(tasks) {
+function sortByDue(tasks) {
   return [...tasks].sort((a, b) => {
+    if (a.completed !== b.completed) return a.completed ? 1 : -1
     if (!a.dueDate && !b.dueDate) return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
     if (!a.dueDate) return 1
     if (!b.dueDate) return -1
-    const diff = new Date(a.dueDate) - new Date(b.dueDate)
-    if (diff !== 0) return diff
-    return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
+    return new Date(a.dueDate) - new Date(b.dueDate)
   })
-}
-
-function formatEventDate(dateStr) {
-  if (!dateStr) return ''
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 export default function SyllabusPage() {
   const { id } = useParams()
   const [tasks, setTasks] = useState([])
   const [syllabus, setSyllabus] = useState(null)
-  const [completed, setCompleted] = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const t = localStorage.getItem('vantage_tasks')
-    if (t) setTasks(JSON.parse(t))
+    const supabase = createClient()
 
-    const c = localStorage.getItem('vantage_completed')
-    if (c) setCompleted(JSON.parse(c))
+    async function loadData() {
+      const { data: sylRow } = await supabase
+        .from('syllabi')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle()
 
-    const s = localStorage.getItem('vantage_syllabi')
-    if (s) {
-      const all = JSON.parse(s)
-      setSyllabus(all.find(x => x.id === id) || null)
+      if (sylRow) {
+        setSyllabus({
+          id: sylRow.id,
+          courseName: sylRow.course_name,
+          instructor: sylRow.instructor,
+          term: sylRow.term
+        })
+      }
+
+      const { data: taskRows } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('syllabus_id', id)
+
+      if (taskRows) {
+        setTasks(taskRows.map(t => ({
+          id: t.id,
+          title: t.title,
+          plainEnglishDescription: t.plain_english_description,
+          dueDate: t.due_date,
+          priority: t.priority,
+          estimatedMinutes: t.estimated_minutes,
+          confidence: t.confidence,
+          steps: t.steps,
+          type: t.type,
+          completed: t.completed
+        })))
+      }
+
+      setLoading(false)
     }
+
+    loadData()
   }, [id])
 
-  function handleComplete(tid) {
-    const next = completed.includes(tid)
-      ? completed.filter(c => c !== tid)
-      : [...completed, tid]
-    setCompleted(next)
-    localStorage.setItem('vantage_completed', JSON.stringify(next))
+  async function handleComplete(tid) {
+    const supabase = createClient()
+    const task = tasks.find(t => t.id === tid)
+    if (!task) return
+    const next = !task.completed
+    setTasks(prev => prev.map(t => t.id === tid ? { ...t, completed: next } : t))
+    await supabase.from('tasks').update({ completed: next }).eq('id', tid)
   }
 
-  const tasksWithCompleted = tasks.map(t => ({ ...t, completed: completed.includes(t.id) }))
-
-  const filtered = sortTasks(tasksWithCompleted.filter(t => {
+  const filtered = sortByDue(tasks.filter(t => {
     if (activeFilter === 'Due This Week') return isThisWeek(t.dueDate)
     if (activeFilter === 'High Priority') return t.priority === 'high'
     return true
   }))
 
-  const importantDates = syllabus?.importantDates || []
-  const policies = syllabus?.policies || null
+  if (loading) return null
+
+  if (tasks.length === 0) {
+    return (
+      <>
+        <Navbar showNav={true} />
+        <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>&#x1F4C2;</div>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#161616', marginBottom: '8px' }}>No tasks found</h2>
+            <p style={{ color: '#525252', fontSize: '14px', marginBottom: '24px' }}>Upload a syllabus to generate your personalised task list.</p>
+            <a href="/upload" style={{
+              backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
+              borderRadius: '8px', padding: '12px 24px', fontSize: '15px',
+              fontWeight: '600', textDecoration: 'none', display: 'inline-block'
+            }}>Upload a Syllabus</a>
+          </div>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
-      <Navbar />
+      <Navbar showNav={true} />
       <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4' }}>
         {/* Header */}
         <div style={{
           background: 'linear-gradient(135deg, #0F62FE, #001D6C)',
-          padding: '28px 32px', minHeight: '80px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
         }}>
           <div>
-            <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#FFFFFF' }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFFFFF' }}>
               {syllabus?.courseName || 'Course Syllabus'}
             </div>
             <div style={{ fontSize: '14px', color: '#93C5FD', marginTop: '4px' }}>
-              {[syllabus?.instructor, syllabus?.term].filter(Boolean).join(' • ')}
+              {syllabus?.instructor} {syllabus?.term ? `• ${syllabus.term}` : ''}
             </div>
           </div>
           <a href={`/api/syllabus/${id}/original`} target="_blank" rel="noreferrer"
             style={{
               backgroundColor: '#FFFFFF', color: '#0F62FE',
-              border: '1px solid #0F62FE', borderRadius: '6px', padding: '8px 16px',
+              border: 'none', borderRadius: '6px', padding: '8px 16px',
               fontSize: '14px', fontWeight: '600', textDecoration: 'none',
               display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
             }}>
-            🔗 View Original PDF
+            &#x1F517; View Original PDF
           </a>
         </div>
 
@@ -116,7 +158,7 @@ export default function SyllabusPage() {
 
         {/* Tasks grid */}
         <div style={{
-          maxWidth: '960px', margin: '0 auto', padding: '24px',
+          maxWidth: '900px', margin: '0 auto', padding: '24px',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
           gap: '16px'
@@ -131,51 +173,9 @@ export default function SyllabusPage() {
           )}
         </div>
 
-        {/* Important Dates */}
-        {importantDates.length > 0 && (
-          <div style={{ maxWidth: '960px', margin: '0 auto 24px', padding: '0 24px' }}>
-            <h3 style={{ fontSize: '16px', color: '#161616', marginBottom: '12px' }}>Important Dates</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {importantDates.map((d, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0F62FE', flexShrink: 0 }} />
-                  <span style={{ color: '#525252', fontSize: '14px', fontWeight: '600', minWidth: '70px' }}>{formatEventDate(d.date)}</span>
-                  <span style={{ color: '#161616', fontSize: '14px' }}>{d.event}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Policies */}
-        {policies && (policies.attendance || policies.lateWork) && (
-          <div style={{ maxWidth: '960px', margin: '0 auto 32px', padding: '0 24px' }}>
-            <div style={{
-              backgroundColor: '#F4F4F4', borderRadius: '8px', padding: '20px',
-              border: '1px solid #E0E0E0'
-            }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#161616' }}>Course Policies</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                {policies.attendance && (
-                  <div>
-                    <div style={{ fontWeight: '600', fontSize: '13px', color: '#525252', marginBottom: '4px' }}>Attendance</div>
-                    <div style={{ fontSize: '14px', color: '#161616' }}>{policies.attendance}</div>
-                  </div>
-                )}
-                {policies.lateWork && (
-                  <div>
-                    <div style={{ fontWeight: '600', fontSize: '13px', color: '#525252', marginBottom: '4px' }}>Late Work</div>
-                    <div style={{ fontSize: '14px', color: '#161616' }}>{policies.lateWork}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Footer */}
-        <div style={{ textAlign: 'center', color: '#525252', fontSize: '11px', padding: '16px', borderTop: '1px solid #E0E0E0' }}>
-          Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
+        <div style={{ textAlign: 'center', color: '#525252', fontSize: '12px', padding: '16px', borderTop: '1px solid #E0E0E0' }}>
+          Powered by IBM Granite and WatsonX • IBM SkillsBuild Hackathon 2025
         </div>
       </div>
     </>
