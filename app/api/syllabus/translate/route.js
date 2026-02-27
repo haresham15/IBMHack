@@ -1,59 +1,90 @@
-export async function POST() {
-  return Response.json({
-    courseName: 'CS 3430 — Data Structures',
-    instructor: 'Dr. Sarah Chen',
-    term: 'Spring 2025',
-    tasks: [
-      {
-        id: 't1',
-        title: 'Programming Assignment 1 — Linked Lists',
-        plainEnglishDescription: 'Build a linked list that can add, remove, and search items. Think of it like a chain where each link points to the next one. You have 2 weeks.',
-        dueDate: '2025-01-31',
-        priority: 'high',
-        estimatedMinutes: 180,
-        confidence: 'high'
-      },
-      {
-        id: 't2',
-        title: 'Midterm Exam',
-        plainEnglishDescription: 'In-class exam on everything from weeks 1 to 7. Bring your student ID. Review your notes from the first 7 lectures.',
-        dueDate: '2025-02-28',
-        priority: 'high',
-        estimatedMinutes: 120,
-        confidence: 'high'
-      },
-      {
-        id: 't3',
-        title: 'Weekly Reading — Chapter 4',
-        plainEnglishDescription: 'Read Chapter 4 before Tuesday class. Focus on pages 88 to 102.',
-        dueDate: '2025-01-21',
-        priority: 'medium',
-        estimatedMinutes: 60,
-        confidence: 'medium'
-      },
-      {
-        id: 't4',
-        title: 'Final Project',
-        plainEnglishDescription: 'Build a graph traversal algorithm and write a 3-page analysis.',
-        dueDate: '2025-04-25',
-        priority: 'high',
-        estimatedMinutes: 480,
-        confidence: 'high'
-      },
-      {
-        id: 't5',
-        title: 'Lab 2',
-        plainEnglishDescription: 'Complete the sorting lab. Due date not fully clear in syllabus — verify with instructor.',
-        dueDate: null,
-        priority: 'medium',
-        estimatedMinutes: 90,
-        confidence: 'low'
+import { join } from 'path'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
+import { syllabusStore } from '@/lib/session-store'
+import { translateSyllabus } from '@/lib/granite/index'
+
+const CACHE_DIR = join(process.cwd(), 'cache')
+
+export async function POST(request) {
+  const { searchParams } = new URL(request.url)
+  const useCache = searchParams.get('useCache') === 'true'
+
+  // Parse JSON body
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return Response.json(
+      { error: true, code: 'VALIDATION_ERROR', message: 'Request body must be valid JSON.' },
+      { status: 400 }
+    )
+  }
+
+  const { syllabusId, capProfile } = body ?? {}
+
+  // Validate required fields
+  if (!syllabusId || !capProfile) {
+    return Response.json(
+      { error: true, code: 'VALIDATION_ERROR', message: 'Both syllabusId and capProfile are required.' },
+      { status: 400 }
+    )
+  }
+
+  // Cache HIT check
+  if (useCache) {
+    const cachePath = join(CACHE_DIR, `${syllabusId}.json`)
+    if (existsSync(cachePath)) {
+      try {
+        const cached = JSON.parse(readFileSync(cachePath, 'utf8'))
+        return Response.json(cached, { headers: { 'X-Cache': 'HIT' } })
+      } catch {
+        // Cache read failed — fall through to recompute
       }
-    ],
-    policies: {
-      attendance: 'Max 3 absences',
-      lateWork: '10% per day, max 5 days'
-    },
-    processedAt: new Date().toISOString()
-  })
+    }
+  }
+
+  // Look up session
+  const session = syllabusStore.get(syllabusId)
+  if (!session) {
+    return Response.json(
+      {
+        error: true,
+        code: 'NOT_FOUND',
+        message: `Syllabus ${syllabusId} not found. It may have expired — please upload the PDF again.`
+      },
+      { status: 404 }
+    )
+  }
+
+  // Run Granite pipeline
+  const startTime = Date.now()
+  let result
+  try {
+    result = await translateSyllabus(session.rawText, capProfile)
+  } catch (err) {
+    console.error('[translate] AI pipeline error:', err.message)
+    return Response.json(
+      { error: true, code: 'AI_ERROR', message: err.message },
+      { status: 500 }
+    )
+  }
+
+  const elapsed = Date.now() - startTime
+  console.log(`[translate] Processed ${syllabusId} in ${elapsed}ms`)
+
+  // Convert estimatedHours → estimatedMinutes for UI compatibility
+  result.tasks = result.tasks.map(t => ({
+    ...t,
+    estimatedMinutes: typeof t.estimatedHours === 'number' ? Math.round(t.estimatedHours * 60) : 120
+  }))
+
+  // Write to cache
+  try {
+    mkdirSync(CACHE_DIR, { recursive: true })
+    writeFileSync(join(CACHE_DIR, `${syllabusId}.json`), JSON.stringify(result))
+  } catch (err) {
+    console.warn('[translate] Cache write failed:', err.message)
+  }
+
+  return Response.json(result, { headers: { 'X-Cache': 'MISS' } })
 }
