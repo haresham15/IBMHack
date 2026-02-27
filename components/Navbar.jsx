@@ -29,6 +29,11 @@ export default function Navbar({ showNav = true }) {
           onMouseLeave={e => e.target.style.textDecoration = 'none'}>
           Upload
         </Link>
+        <Link href="/campus-map" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+          onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
+          🗺️ Campus Map
+        </Link>
       </div>
     </nav>
   )
