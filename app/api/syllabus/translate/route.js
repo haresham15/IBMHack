@@ -8,6 +8,40 @@ const CACHE_DIR = join(process.cwd(), 'cache')
 export async function POST(request) {
   const { searchParams } = new URL(request.url)
   const useCache = searchParams.get('useCache') === 'true'
+  const syllabusName = searchParams.get('syllabusName')
+
+  // ── Named demo shortcut ──────────────────────────────────────────────────
+  // ?syllabusName=<name> bypasses body parsing entirely.
+  // Returns pre-cached data instantly — no session or Granite call needed.
+  if (syllabusName) {
+    // Sanitise: only allow alphanumeric, hyphens, underscores (no path traversal)
+    const safeName = syllabusName.replace(/[^a-zA-Z0-9_-]/g, '')
+    if (!safeName) {
+      return Response.json(
+        { error: true, code: 'VALIDATION_ERROR', message: 'Invalid syllabusName.' },
+        { status: 400 }
+      )
+    }
+    const nameCachePath = join(CACHE_DIR, `${safeName}.json`)
+    if (existsSync(nameCachePath)) {
+      try {
+        const cached = JSON.parse(readFileSync(nameCachePath, 'utf8'))
+        return Response.json(cached, { headers: { 'X-Cache': 'HIT' } })
+      } catch {
+        // Cache file corrupted — fall through to 404
+      }
+    }
+    return Response.json(
+      {
+        error: true,
+        code: 'NOT_FOUND',
+        message: `Demo cache '${safeName}' not found. Run: node scripts/cache_demo_syllabi.mjs`
+      },
+      { status: 404 }
+    )
+  }
+
+  // ── Standard flow ────────────────────────────────────────────────────────
 
   // Parse JSON body
   let body
@@ -30,7 +64,8 @@ export async function POST(request) {
     )
   }
 
-  // Cache HIT check
+  // ?useCache=true — check disk cache BEFORE session lookup.
+  // This ensures demo playback works even after a server restart (session gone, cache intact).
   if (useCache) {
     const cachePath = join(CACHE_DIR, `${syllabusId}.json`)
     if (existsSync(cachePath)) {
