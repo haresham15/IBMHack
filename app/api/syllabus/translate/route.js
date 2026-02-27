@@ -5,7 +5,36 @@ import { translateSyllabus } from '@/lib/granite/index'
 
 const CACHE_DIR = join(process.cwd(), 'cache')
 
+// ── In-memory rate limiter ────────────────────────────────────────────────────
+// Keyed by IP, stores { count, windowStart } per IP.
+// 10 requests per IP per 60-second window.
+const rateLimitMap = new Map()
+const RATE_LIMIT = 10
+const RATE_WINDOW_MS = 60_000
+
+function checkRateLimit(ip) {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now })
+    return false // not limited
+  }
+  entry.count++
+  return entry.count > RATE_LIMIT // limited if over threshold
+}
+
 export async function POST(request) {
+  // Rate limiting
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim()
+    ?? request.headers.get('x-real-ip')
+    ?? 'unknown'
+  if (checkRateLimit(ip)) {
+    return Response.json(
+      { error: true, code: 'RATE_LIMITED', message: 'Too many requests. Please wait 60 seconds.' },
+      { status: 429 }
+    )
+  }
+
   const { searchParams } = new URL(request.url)
   const useCache = searchParams.get('useCache') === 'true'
   const syllabusName = searchParams.get('syllabusName')

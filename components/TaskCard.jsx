@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 const PRIORITY_COLORS = {
   high: '#DA1E28',
-  medium: '#B28600',
+  medium: '#7D5A00', // darkened for AA contrast with white text
   low: '#198038'
 }
 
@@ -18,8 +18,8 @@ function formatDueDate(dueDate) {
 function formatTime(minutes) {
   if (!minutes) return ''
   if (minutes >= 60) {
-    const hrs = Math.round(minutes / 10) / 6
-    return `~${Math.round(hrs * 10) / 10} hr`
+    const hrs = Math.round(minutes / 30) / 2
+    return `~${hrs} hr`
   }
   return `~${minutes} min`
 }

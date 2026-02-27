@@ -7,8 +7,8 @@ export default function RootLayout({ children }) {
     <html lang='en'>
       <head>
         <title>Vantage — AI for Every Campus Brain</title>
-        <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
-        <meta name='description' content='AI-powered accessibility layer for neurodivergent university students' />
+        <meta name='description' content='Vantage uses IBM Granite to turn your syllabus into a personalised task list, proactively alerts you to deadlines, and walks you through complex university forms.' />
+        <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
       </head>
       <body style={{ fontFamily: 'IBM Plex Sans, sans-serif', margin: 0 }}>
         <DemoReset />

@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: { serverComponentsExternalPackages: ['pdf-parse', 'formidable', 'ibm-cos-sdk'] },
+  experimental: {
+    serverComponentsExternalPackages: ['pdf-parse', 'formidable', 'ibm-cos-sdk']
+  },
+  api: {
+    responseLimit: '10mb'
+  },
 
   // mapbox-gl v3 bundles its own worker inline but still references browser globals.
   // Excluding it from server-side bundling prevents "window is not defined" errors.
