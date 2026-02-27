@@ -23,6 +23,11 @@ const CAP_QUESTIONS = [
     type: 'text', options: null, values: null }
 ]
 
+const DEFAULT_CAP = {
+  displayName: 'Demo Student', informationDensity: 'moderate',
+  timeHorizon: '72h', supportLevel: 'step-by-step', sensoryFlags: [], sessionId: 'demo'
+}
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [messages, setMessages] = useState([])
@@ -32,6 +37,8 @@ export default function OnboardingPage() {
   const [showTyping, setShowTyping] = useState(false)
   const [multiSelected, setMultiSelected] = useState([])
   const [textInput, setTextInput] = useState('')
+  const [apiError, setApiError] = useState(null)
+  const [retryAnswers, setRetryAnswers] = useState(null)
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -59,6 +66,27 @@ export default function OnboardingPage() {
     })
   }
 
+  async function submitCAP(allAnswers) {
+    setApiError(null)
+    try {
+      const res = await fetch('/api/cap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: allAnswers })
+      })
+      if (!res.ok) throw new Error('API error ' + res.status)
+      const cap = await res.json()
+      localStorage.setItem('vantage_cap', JSON.stringify(cap.capProfile))
+      const name = allAnswers.find(a => a.questionId === 'q5')?.answer || 'there'
+      await addVantageMessage(`Perfect! I have saved your profile, ${name}. Your Vantage experience is ready.`)
+      setTimeout(() => router.push('/dashboard'), 1200)
+    } catch {
+      setApiError('Could not save your profile. Please try again.')
+      setRetryAnswers(allAnswers)
+      setIsComplete(false)
+    }
+  }
+
   async function handleAnswer(value, displayText) {
     const q = CAP_QUESTIONS[questionIndex]
     setMessages(m => [...m, { role: 'user', text: displayText }])
@@ -77,16 +105,7 @@ export default function OnboardingPage() {
       await new Promise(r => setTimeout(r, 400))
       await addVantageMessage(`Great to meet you, ${name}! Setting up your profile...`)
       setIsComplete(true)
-      try {
-        const res = await fetch('/api/cap', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ answers: newAnswers })
-        })
-        const cap = await res.json()
-        localStorage.setItem('vantage_cap', JSON.stringify(cap.capProfile))
-      } catch {}
-      setTimeout(() => router.push('/dashboard'), 1200)
+      await submitCAP(newAnswers)
     }
   }
 
@@ -98,6 +117,11 @@ export default function OnboardingPage() {
       return q.options[idx]
     }).join(', ') : 'None'
     handleAnswer(values, displayText)
+  }
+
+  function handleSkip() {
+    localStorage.setItem('vantage_cap', JSON.stringify(DEFAULT_CAP))
+    router.push('/dashboard')
   }
 
   const currentQ = CAP_QUESTIONS[questionIndex]
@@ -113,7 +137,8 @@ export default function OnboardingPage() {
       `}</style>
       <div style={{
         minHeight: '100vh', background: 'linear-gradient(180deg, #0F62FE 0%, #ffffff 40%)',
-        fontFamily: 'IBM Plex Sans, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center'
+        fontFamily: 'IBM Plex Sans, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center',
+        position: 'relative'
       }}>
         {/* Header */}
         <div style={{ padding: '32px 24px 16px', textAlign: 'center' }}>
@@ -149,7 +174,7 @@ export default function OnboardingPage() {
               borderRadius: '12px 12px 12px 0', width: 'fit-content', animation: 'fadeIn 200ms ease' }}>
               {[0,1,2].map(i => (
                 <div key={i} style={{
-                  width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#525252',
+                  width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0F62FE',
                   animation: `dot-pulse 1.2s ease-in-out ${i * 0.2}s infinite`
                 }} />
               ))}
@@ -158,8 +183,21 @@ export default function OnboardingPage() {
           <div ref={bottomRef} />
         </div>
 
+        {/* API Error */}
+        {apiError && (
+          <div style={{ width: '100%', maxWidth: '640px', padding: '0 16px 12px' }}>
+            <div style={{ backgroundColor: '#FFF5F5', border: '1px solid #DA1E28', borderRadius: '8px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: '#DA1E28', fontSize: '14px' }}>❌ {apiError}</span>
+              <button onClick={() => { setApiError(null); submitCAP(retryAnswers) }} style={{
+                backgroundColor: '#DA1E28', color: '#FFFFFF', border: 'none',
+                borderRadius: '6px', padding: '6px 14px', cursor: 'pointer', fontSize: '13px'
+              }}>Retry</button>
+            </div>
+          </div>
+        )}
+
         {/* Input area */}
-        {!isComplete && messages.length > 0 && !showTyping && (
+        {!isComplete && messages.length > 0 && !showTyping && !apiError && (
           <div style={{ width: '100%', maxWidth: '640px', padding: '16px', backgroundColor: '#FFFFFF' }}>
             {currentQ.type === 'single' && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -171,8 +209,8 @@ export default function OnboardingPage() {
                       padding: '8px 16px', cursor: 'pointer', fontSize: '14px',
                       transition: 'background 150ms, color 150ms'
                     }}
-                    onMouseEnter={e => { e.target.style.backgroundColor = '#0F62FE'; e.target.style.color = '#FFFFFF' }}
-                    onMouseLeave={e => { e.target.style.backgroundColor = '#FFFFFF'; e.target.style.color = '#0F62FE' }}>
+                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0F62FE'; e.currentTarget.style.color = '#FFFFFF' }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#FFFFFF'; e.currentTarget.style.color = '#0F62FE' }}>
                     {opt}
                   </button>
                 ))}
@@ -228,6 +266,13 @@ export default function OnboardingPage() {
             )}
           </div>
         )}
+
+        {/* Skip link */}
+        <button onClick={handleSkip} style={{
+          position: 'fixed', bottom: '16px', right: '20px',
+          background: 'none', border: 'none', color: '#525252',
+          fontSize: '12px', cursor: 'pointer', textDecoration: 'underline'
+        }}>Skip onboarding (demo)</button>
       </div>
     </>
   )
