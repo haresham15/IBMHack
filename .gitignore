@@ -40,3 +40,6 @@ next-env.d.ts
 cache/
 demo-syllabi/
 uploads/
+
+package-lock.json
+package.json

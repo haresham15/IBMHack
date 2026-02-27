@@ -10,10 +10,15 @@ export default function Navbar({ showNav = true }) {
       justifyContent: 'space-between', padding: '0 24px', zIndex: 100
     }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-        <span style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '20px' }}>Vantage</span>
+        <span aria-label="Vantage Home" style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '20px' }}>Vantage</span>
         <span style={{ color: '#93C5FD', fontSize: '13px' }}>AI for Every Brain</span>
       </div>
       <div style={{ display: 'flex', gap: '24px' }}>
+        <Link href="/map" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none' }}
+          onMouseEnter={e => e.target.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.target.style.textDecoration = 'none'}>
+          Campus Map
+        </Link>
         <Link href="/dashboard" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none' }}
           onMouseEnter={e => e.target.style.textDecoration = 'underline'}
           onMouseLeave={e => e.target.style.textDecoration = 'none'}>
@@ -23,6 +28,11 @@ export default function Navbar({ showNav = true }) {
           onMouseEnter={e => e.target.style.textDecoration = 'underline'}
           onMouseLeave={e => e.target.style.textDecoration = 'none'}>
           Upload
+        </Link>
+        <Link href="/campus-map" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+          onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
+          🗺️ Campus Map
         </Link>
       </div>
     </nav>

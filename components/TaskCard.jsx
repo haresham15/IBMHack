@@ -58,11 +58,19 @@ export default function TaskCard({ task, onComplete }) {
       />
 
       {/* Row 1: Title + Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', paddingRight: '28px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', paddingRight: '28px', flexWrap: 'wrap' }}>
         <span style={{
           fontWeight: 'bold', fontSize: '15px', color: '#161616',
           textDecoration: task.completed ? 'line-through' : 'none'
         }}>{task.title}</span>
+        {task.syllabusId && (
+          <a href={`/syllabus/${task.syllabusId}`} style={{
+            fontSize: '11px', color: '#0F62FE', textDecoration: 'none',
+            backgroundColor: '#EDF5FF', padding: '2px 6px', borderRadius: '4px'
+          }}>
+            ↗ View Source
+          </a>
+        )}
         <span style={{
           marginLeft: 'auto',
           backgroundColor: borderColor, color: '#FFFFFF',

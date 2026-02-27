@@ -1,0 +1,508 @@
+PROJECT VANTAGE
+The AI Accessibility Layer for Every Campus
+Product Requirements Document  •  IBM SkillsBuild Hackathon 2025  •  General Track
+Document Owner
+Team Vantage — IBM SkillsBuild Hackathon
+Version
+1.0  (Hackathon Submission Draft)
+Status
+Final — Ready for Submission
+IBM Tools Used
+IBM Granite LLM · WatsonX.ai · WatsonX Orchestrate · IBM Cloud · IBM App Connect · IBM OpenPages
+Target Scale
+Multi-university deployment within 12 months post-MVP
+1. Executive Summary
+Vantage is an AI-powered accessibility layer that sits 
+on top of
+ a university's existing infrastructure — translating the institution's complexity into a personalised, structured, and proactively managed experience for neurodivergent students. It requires zero replacement of existing university systems and is deployable within 90 days of a signed pilot agreement.
+🎯  The Core Insight
+Universities are not failing neurodivergent students academically — they are failing them administratively.
+Vantage does not rebuild the university. It translates it.
+1.1  The Crisis in Numbers
+Statistic
+Source
+Only 58% of neurodivergent students graduate vs. 79% neurotypical peers
+National Council on Disability, 2023
+50% attrition rate for autistic college students specifically
+Journal of Autism & Developmental Disorders
+50% of neurodivergent dropouts cite lack of accommodations as primary cause
+AHEAD Disability Services Survey, 2022
+1 in 5 college students is neurodivergent; many are undiagnosed
+CDC / NCES, 2023
+1 disability counselor per 700+ students on average
+AHEAD National Survey of Disability Services, 2023
+85% unemployment rate for autistic adults without a college degree
+Autism Speaks Employment Report, 2023
+These are not statistics about academic ability. Students who persist show 
+comparable GPAs to neurotypical peers
+. The dropout is driven entirely by systemic friction — dense PDFs, confusing portals, inaccessible processes, and a complete absence of proactive support. Vantage directly targets this friction.
+2. Problem Statement
+2.1  The Hidden Dropout
+Universities have a graduation gap they cannot fully explain. When neurodivergent students drop out, the documented cause is rarely 'failed courses.' It is almost universally administrative collapse: a financial aid deadline lost in a 2005-era portal, a syllabus rubric that used ambiguous language the student could not decode, a housing form that required 14 sequential steps to complete under cognitive load. These are solvable problems that no one has solved because the solution requires crossing the boundary between AI capability and university bureaucracy.
+2.2  Root Cause Analysis
+Failure Point
+How It Appears to the Student
+Downstream Consequence
+Neuro-rigid portals
+Financial aid PDF buried 4 levels deep in a low-contrast UI
+Student loses aid — drops out
+Ambiguous syllabi
+'Submit a substantial analysis' — no word count, no rubric clarity
+Paralysis, incomplete submissions, failing grade
+Passive support systems
+Disability office requires student to initiate every interaction
+Student with executive dysfunction never initiates — receives no help
+Sensory-hostile environments
+No data on quiet spaces, crowded routes, or low-stimulation windows
+Student avoids campus — misses classes, office hours, social connection
+Fragmented communication
+Deadlines across email, LMS, department website, physical bulletin boards
+Missed deadlines, accumulated anxiety, withdrawal
+2.3  Why Existing Solutions Fail
+Disability Services Offices: 
+Understaffed (1:700 ratio), reactive not proactive, require the student to self-advocate at their most vulnerable.
+LMS Platforms (Canvas, Blackboard): 
+One-size-fits-all interfaces with no personalisation, no plain-language conversion, no executive function scaffolding.
+Generic AI tools (ChatGPT, Notion AI): 
+Not integrated with university systems. Require the student to initiate every interaction. No agentic action. Not designed for neurodivergent-specific needs.
+University App Portals: 
+Replicate the complexity of the original system in mobile form. Still require the student to navigate bureaucracy.
+✅  The Vantage Difference
+Vantage is the ONLY solution that: (1) integrates with real university systems, (2) acts proactively without requiring student initiation, (3) personalises output to a neurodivergent cognitive profile, and (4) is deployable in under 12 months without university IT rebuilds.
+3. Product Overview
+Vantage is structured around four deeply integrated pillars, each powered by specific IBM tools. Every pillar is independently deployable, allowing for a phased rollout, but they are designed to reinforce each other in the full product.
+PILLAR 1 — The Cognitive Accessibility Profile (CAP) Engine
+What it does
+On first launch, Vantage guides the student through a natural-language onboarding conversation (not a clinical form). The conversation is powered by a WatsonX.ai Granite-3.x model and lasts approximately 4 minutes. It asks about information preferences, deadline anxiety, sensory sensitivities, and task management style. No clinical diagnosis is required or requested. The student is told: 'This helps Vantage communicate with you in the way that works best for your brain.'
+What it produces
+A Cognitive Accessibility Profile (CAP) — a structured JSON schema stored exclusively on IBM Cloud, linked only to an anonymised student ID. The CAP contains:
+Information Density Preference: 
+Summary-only / Moderate detail / Full detail
+Time Horizon: 
+How far ahead the student wants to be warned about deadlines (24h / 72h / 1 week / 2 weeks)
+Sensory Flags: 
+Loud spaces, fluorescent lighting, high foot traffic, open-plan environments
+Executive Function Support Level: 
+Reminder-only / Step-by-step guidance / Full agent-assisted task completion
+Communication Channel: 
+Push notification / SMS / Email / In-app only
+Trusted Contact: 
+Optional. A designated person (advisor, friend, parent) who receives a gentle nudge if the student disengages for a defined period
+🔒  Privacy Architecture
+The CAP is owned entirely by the student. No professor, advisor, or administrator can view it without the student explicitly sharing a sanitised summary.
+The CAP is NOT medical data — it is self-reported preference data, analogous to a 'learning style profile.'
+IBM OpenPages governs all data access policies. Student ID is anonymised at rest.
+FERPA compliance: Vantage operates as a student-controlled tool. No institutional data is transmitted without student-initiated consent.
+HIPAA note: CAP data is not classified as Protected Health Information (PHI) because no clinical diagnosis is stored. This has been architecturally enforced.
+PILLAR 2 — The Translation Layer
+What it does
+Every piece of university communication — syllabi, financial aid letters, housing forms, policy documents, assignment rubrics — is automatically ingested, parsed, and rewritten by IBM Granite LLM according to the student's CAP. The student never has to interact with the original document unless they choose to. A 'View Original' button is always present.
+Syllabus-to-Life Converter
+When a syllabus PDF is uploaded (by the student, or auto-fetched from the LMS if integration exists), Granite:
+Parses
+ the full document, identifying all deadlines, assignments, rubrics, and attendance policies
+Generates
+ a colour-coded, prioritised weekly task calendar broken into daily micro-actions
+Rewrites
+ every assignment description in plain language calibrated to the student's CAP information density preference
+Annotates
+ every rubric with a plain-English explanation of what the professor actually wants
+Creates
+ a 'What does this mean?' explainer card for any ambiguous academic terminology
+⚠️  Syllabus Parsing Limitations — Addressed
+Syllabi come in hundreds of formats: scanned PDFs, embedded tables, informal prose, inconsistent date notation.
+MVP Scope: Vantage's MVP demo uses 3 pre-tested real syllabi from the team's own university to ensure clean parsing.
+Production Solution: A Granite prompt chain with a 'structured extraction' pass followed by a 'confidence scoring' pass. Low-confidence extractions are flagged for student review rather than presented as definitive.
+The student always has access to the original document. Vantage never presents a translation as a replacement — only as a supplement.
+Financial Aid & Admin Document Translation
+For any university administrative document, Granite converts it into a numbered checklist in plain language, with each step written as a single clear action. A WatsonX Orchestrate agent then stands by to walk the student through each step in a conversational chat interface — including pre-filling form fields where API integration permits.
+Integration Architecture for Document Ingestion
+Document Source
+MVP Approach
+Phase 2 Approach
+Syllabi
+Manual PDF upload by student
+Auto-fetch from Canvas/Blackboard LMS via REST API
+Financial Aid Notices
+Student forwards email or uploads PDF
+IBM App Connect integration with Student Information System (Banner/PeopleSoft)
+Housing Forms
+Manual upload or URL paste
+Direct API connection to housing portal
+Course Deadlines
+Extracted from syllabi at upload time
+Real-time LMS calendar API sync
+⚠️  ERP Integration Reality Check — Addressed
+Banner, PeopleSoft, and Workday are notoriously closed systems. Full API integration is NOT a hackathon weekend task.
+MVP clearly scopes ERP integration as Phase 2.
+IBM App Connect is named as the integration middleware for Phase 2, demonstrating architectural awareness.
+The MVP demo uses a mock CSV data feed to simulate real-time deadline data — this is clearly labelled as a simulation in the demo.
+PILLAR 3 — The Proactive Agent
+What it does
+This is the most differentiating feature of Vantage. WatsonX Orchestrate monitors student engagement with their task list, deadline proximity, and document interaction history. When risk signals appear, the agent does not wait for the student to ask for help. It initiates.
+Risk Signal Detection
+Risk Signal
+Threshold
+Agent Action
+Task list not opened
+72 hours of inactivity
+Gentle in-app prompt: 'You have 3 tasks this week — want a quick 2-min review?'
+Critical deadline approaching
+Within student's CAP time horizon
+Plain-language alert + offer to open guided form walk-through
+Required document not opened
+Financial aid form within 5 days of deadline
+'I noticed you haven't opened your FAFSA form. Want to do it together right now? ~8 min.'
+Prolonged disengagement
+7+ days of no activity (configurable)
+Gentle nudge to student's designated Trusted Contact (only if pre-authorised by student)
+Agent-Assisted Form Completion
+When a student accepts the agent's offer to complete a form together, WatsonX Orchestrate:
+Step 1: 
+Renders the form as a conversational chat sequence — one question at a time, in plain language
+Step 2: 
+Pre-populates any fields it can from already-known student data (with student permission)
+Step 3: 
+Saves progress automatically, so the student can pause and resume without losing work
+Step 4: 
+Submits the completed form to the university portal via API, or exports a completed PDF if direct API access is unavailable (MVP: PDF export)
+🔒  Trusted Contact — Privacy & Consent Architecture
+The Trusted Contact feature is 100% opt-in. Students designate their contact at setup and can remove or change it at any time.
+The nudge sent to the Trusted Contact contains ZERO academic or medical information. It reads only: 'Vantage noticed [Name] may benefit from a check-in this week.'
+No contact is ever notified without student pre-authorisation. The feature defaults to OFF.
+PILLAR 4 — The Sensory Campus Map
+What it does
+Using real-time occupancy and scheduling data that universities already collect, Vantage builds a live sensory map of campus — helping neurodivergent students navigate, study, and plan in ways that minimise sensory overload.
+Data Sources (Real, Not Synthetic)
+Campus Wi-Fi density feeds: 
+Universities track device counts per access point for network management. This data is available internally and does not require new infrastructure.
+Classroom scheduling APIs: 
+Room booking systems (25Live, EMS) expose occupancy schedules via API.
+Student-contributed data: 
+In-app 'quiet spot check-ins' allow students to mark locations as quiet/loud in real time, building a crowdsourced layer over the institutional data.
+⚠️  Campus Data Access — Scoped Appropriately
+Full real-time Wi-Fi integration requires a formal data-sharing agreement with university IT. This is NOT an MVP feature.
+MVP approach: The sensory map is seeded from publicly available class schedules and student crowdsourced check-ins only.
+Phase 2: IBM App Connect facilitates a controlled API connection to campus Wi-Fi occupancy data under a university data-sharing agreement.
+This is explicitly labelled as Phase 2 in the deployment roadmap and in the demo.
+Features
+Quiet Route Navigation: 
+Given a destination and departure time, Vantage suggests the least-crowded walking path based on class schedule and historical occupancy patterns
+Low-Sensory Study Windows: 
+'The 3rd floor of Dreese Labs is typically at 15% capacity between 2–4 PM on Tuesdays based on class schedules'
+Safe Space Registry: 
+Student-maintained map of designated sensory-friendly rooms, study carrels, and quiet lounges on campus
+Pre-Trip Planner: 
+Before a heavy campus day, Vantage generates a sensory-optimised schedule: which buildings to go to, in what order, with buffer time built in
+4. IBM Tool Integration Map
+Every IBM tool named in this document is load-bearing — not decorative. The following table maps each tool to the specific Vantage features it powers and explains why it cannot be replaced by a generic alternative.
+IBM Tool
+Vantage Feature Powered
+Why Not GPT-4 / Generic?
+Deployment Phase
+IBM Granite 3.x LLM
+Syllabus parsing, plain-language translation, CAP conversation, document rewriting
+Enterprise governance, on-prem/cloud-private deployment means student data NEVER leaves IBM Cloud. Granite is built for regulated industries — critical for FERPA compliance.
+MVP + All Phases
+WatsonX.ai
+Model hosting, CAP engine, confidence scoring on parsed documents, prompt chaining
+Model governance and explainability layer. Judges can audit why the model made a specific translation decision.
+MVP + All Phases
+WatsonX Orchestrate
+Proactive agent, risk signal monitoring, form walk-through, multi-step task execution, Trusted Contact alerts
+Enterprise-grade agentic framework with human-in-the-loop controls. Not just a chatbot — it executes multi-step workflows across integrated systems.
+MVP + All Phases
+IBM Cloud (Kubernetes)
+Application hosting, horizontal scaling, isolated university data environments (namespace per institution)
+Containerised microservices allow Vantage to onboard a new university as a new Kubernetes namespace — no code changes required.
+MVP + All Phases
+IBM Cloud Object Storage
+Secure document ingestion pipeline, storage of uploaded syllabi and translated outputs
+Server-side encryption and access control policies ensure documents are never publicly exposed.
+MVP + All Phases
+IBM App Connect
+Phase 2 integration with Banner, PeopleSoft, Canvas LMS, 25Live scheduling, Wi-Fi occupancy APIs
+Pre-built university ERP connectors. Reduces integration time from months to weeks.
+Phase 2+
+IBM OpenPages
+Student data governance, FERPA policy enforcement, audit trail for all data access
+Regulatory compliance framework. Provides an auditable record proving Vantage never shared student CAP data with university administrators without consent.
+Phase 1+
+5. Technical Architecture
+5.1  System Architecture Overview
+Vantage is a cloud-native, microservices-based application deployed on IBM Cloud Kubernetes Service. The system is designed for multi-tenancy from day one, with each university operating in an isolated Kubernetes namespace with its own data boundaries.
+Layer
+Components
+Presentation
+React Native (iOS + Android) + React Web App. A single codebase serves both mobile and web via Expo.
+API Gateway
+IBM API Connect — rate limiting, authentication (OAuth 2.0 + SAML for university SSO), request routing
+Application Services
+Node.js microservices (containerised): CAP Service, Document Ingestion Service, Translation Service, Agent Orchestration Service, Sensory Map Service
+AI Layer
+IBM Granite 3.x (via WatsonX.ai REST API), WatsonX Orchestrate (agent runtime), Prompt chaining pipeline for multi-pass document parsing
+Data Layer
+IBM Cloud Object Storage (documents), PostgreSQL on IBM Cloud (CAP profiles, task data), Redis (session + agent state caching)
+Integration Layer
+IBM App Connect (Phase 2 ERP connectors), REST API adapters for LMS (Canvas/Blackboard), Webhook listeners for email forwarding pipeline
+Governance
+IBM OpenPages (policy enforcement), IBM Cloud IAM (role-based access), All data encrypted at rest (AES-256) and in transit (TLS 1.3)
+5.2  Data Flow — Syllabus Translation
+The following is the exact step-by-step data flow for the primary Syllabus-to-Life feature:
+Step 1: 
+Student uploads PDF via app → stored in IBM Cloud Object Storage (encrypted)
+Step 2: 
+Document Ingestion Service extracts raw text (using Apache Tika) and passes to WatsonX.ai
+Step 3: 
+Granite runs Extraction Pass — identifies assignments, deadlines, rubrics, policies with confidence scores
+Step 4: 
+Low-confidence extractions are flagged and queued for student confirmation
+Step 5: 
+Translation Pass — Granite rewrites all content according to the student's CAP (density, language level, time horizon)
+Step 6: 
+Task Calendar Service generates the prioritised to-do list and pushes to the student's dashboard
+Step 7: 
+WatsonX Orchestrate schedules proactive reminder agents based on extracted deadlines and CAP time horizon preference
+Step 8: 
+Original document remains accessible to student via 'View Original' link at all times
+5.3  MVP Tech Stack
+Component
+Technology
+Status
+Frontend
+React (Web) — Expo React Native for mobile in Phase 1+
+In development
+LLM
+IBM Granite 3.x via WatsonX.ai REST API
+API key obtained
+Agent Runtime
+WatsonX Orchestrate
+Workflow designed
+Document Parsing
+Apache Tika (text extraction) + Granite (structured extraction)
+Tested on 3 real syllabi
+Database
+PostgreSQL (IBM Cloud)
+Schema defined
+Object Storage
+IBM Cloud Object Storage
+Bucket configured
+Auth
+OAuth 2.0 (Google/University SSO)
+Implemented
+6. Deployment Roadmap (0–12 Months)
+📋  Hackathon Requirement: Deployable at Scale in Under 12 Months
+The following roadmap demonstrates a clear, credible, technically grounded path from MVP to multi-university deployment.
+Each phase has a concrete deliverable, a go/no-go criterion, and a realistic IBM Cloud infrastructure requirement.
+This is not aspirational. Each phase is scoped to what a 4-person team with IBM Cloud access can realistically execute.
+Phase
+Timeline
+Deliverables
+Go/No-Go Criterion
+0 — Hackathon MVP
+Weekend
+Working web app: CAP onboarding + Syllabus translation on 3 real syllabi + Proactive agent mock workflow + Demo video
+Live Granite output demonstrated in video
+1 — Pilot
+Months 1–3
+Recruit 50–100 neurodivergent students via campus Disability Services office. Deploy CAP engine + Translation Layer + Proactive Agent on IBM Cloud. Measure: task completion rate, deadline miss rate, student NPS.
+25+ active students, positive NPS
+2 — Integration
+Months 4–6
+IBM App Connect integration with Canvas LMS (calendar API). Financial aid deadline auto-import. Sensory Campus Map MVP using class schedule data + crowdsourced check-ins. Mobile app (React Native) launch.
+LMS integration live, sensory map active
+3 — Expand
+Months 7–9
+Federated multi-university deployment on IBM Cloud Kubernetes. Onboard 3–5 additional universities. Each gets isolated namespace. ERP integration (Banner/PeopleSoft) via App Connect for 2 pilot schools.
+3+ universities live, retention data emerging
+4 — Scale
+Months 10–12
+Publish retention outcome data from Phase 1 cohort. Target state university systems and community college networks. Full sensory map with Wi-Fi occupancy data at 2+ schools. Approach accreditation bodies about formal accommodation credit.
+Measurable retention improvement vs. control cohort
+💰  Business Case for Universities
+Retaining one neurodivergent student generates $25,000–$60,000 in tuition revenue.
+At 50 retained students per year, Vantage generates $1.25M–$3M in tuition recovery per institution.
+Vantage can be offered at $15–25/student/month — a trivial cost vs. the tuition recovery ROI.
+This also reduces Disability Services office caseload, freeing counselors for complex human-only work.
+7. Risk & Loophole Registry
+Every identified risk has been addressed architecturally, legally, or by scoping. This section serves as proof to judges that the team has thought critically about weaknesses.
+#
+Risk
+Category
+Mitigation
+Status
+1
+FERPA compliance for student data ingestion
+Legal / Privacy
+Student-owned CAP, explicit opt-in consent, IBM OpenPages governance, no institutional data sharing without student initiation
+FULLY ADDRESSED
+2
+CAP as quasi-medical data (HIPAA concern)
+Legal / Privacy
+No clinical diagnosis stored. CAP is self-reported preference data only. Architecturally enforced — no diagnosis field exists in the schema.
+FULLY ADDRESSED
+3
+Syllabus parsing accuracy on edge-case formats
+Technical
+Confidence scoring on all extractions. Low-confidence items flagged for student review. 'View Original' always accessible.
+ADDRESSED
+4
+ERP integration complexity (Banner, PeopleSoft)
+Technical
+Scoped to Phase 2. MVP uses manual upload + CSV simulation. IBM App Connect named as Phase 2 middleware.
+SCOPED OUT
+5
+WatsonX Orchestrate setup complexity for MVP
+Technical
+Agent workflow logic demonstrated via flowchart in demo if live agent not fully wired. Core Granite translation must be live.
+FALLBACK READY
+6
+'Why not GPT-4?' objection from judges
+Competitive
+Granite is enterprise-grade with on-prem deployment, data never leaves IBM Cloud, built for regulated industries. Explainability layer for audit. GPT-4 cannot guarantee data residency.
+FULLY ADDRESSED
+7
+'This already exists' objection
+Competitive
+No product combines: (1) neurodivergent-specific CAP, (2) proactive agentic action, (3) real university system integration, (4) IBM Cloud privacy guarantees.
+FULLY ADDRESSED
+8
+AI mistranslates deadline — student misses it
+Liability
+'View Original' always present. Vantage is explicitly a supplement, never a replacement. Confidence scores shown for all parsed deadlines.
+FULLY ADDRESSED
+9
+Campus Wi-Fi data access requires IT agreement
+Operational
+Sensory Map MVP uses class schedules + crowdsourced check-ins only. Wi-Fi integration explicitly Phase 2.
+SCOPED OUT
+10
+Team has no neurodivergent members (assumed)
+Ethical
+Co-design explicitly planned with Disability Services office in Phase 1. Quotes/insights from neurodivergent students included in demo video if possible.
+PARTIALLY ADDRESSED
+11
+Scalability proof required within 12 months
+Hackathon Rule
+Section 6 deployment roadmap explicitly addresses this. IBM Cloud Kubernetes horizontal scaling architecture demonstrates technical scalability.
+FULLY ADDRESSED
+12
+Demo uses synthetic/fake data
+Hackathon Rule
+Demo uses 3 real syllabi from team's university. Granite outputs are live-generated, not pre-recorded. Mock data labelled as such in demo narration.
+FULLY ADDRESSED
+8. Demo Strategy & Video Script Outline
+8.1  4-Minute Video Structure
+Section
+Time
+Content
+Hook + Problem
+0:00–0:45
+Open on black screen. Single stat: '58% of neurodivergent students graduate. 79% of everyone else does.' Voice over: 'I lost my financial aid junior year. Not because I failed. Because I couldn't find the form.' Cut to problem stats — fast, punchy, emotional.
+Product Demo
+0:45–2:45
+LIVE DEMO (not mockup). Show: (1) CAP onboarding chat, 30 seconds. (2) Upload a real syllabus PDF — show Granite output in real time: the plain-language task list populates. (3) Show the proactive agent triggering a missed-deadline alert and offering the guided form walk-through. These must be live AI outputs.
+Tech Stack
+2:45–3:30
+Architecture diagram slide. Voice over names each IBM tool and its exact role. '...and because all of this runs on IBM Cloud, a student's cognitive profile never leaves a secure, FERPA-compliant environment.' End with the 12-month deployment roadmap graphic.
+Issues + Future
+3:30–4:00
+'What we know Vantage still needs: (1) formal university ERP integration — Phase 2, powered by IBM App Connect. (2) Co-design validation with neurodivergent students — planned for pilot phase. (3) Real-time sensory data — Phase 2 with campus IT partnership.' End with the human moment: 'The form was always there. We just needed to make it findable.'
+8.2  Demo Must-Haves
+🎬  Non-Negotiable Demo Requirements
+1. The Granite LLM translation output MUST be live-generated in the demo, not pre-recorded.
+2. The syllabi used in the demo MUST be real syllabi from your university (not fake/generated documents).
+3. Every statistic cited on screen must be attributed to a real source.
+4. The words '12-month deployment' must be spoken aloud during the Tech Stack section.
+5. The 'View Original' button must be visible in the demo UI.
+6. Every IBM tool must be named AND connected to a specific on-screen action.
+9. Competitive Differentiation
+Feature
+Vantage
+Disability Office
+Canvas/LMS
+ChatGPT
+Notion AI
+Neurodivergent-specific personalisation
+YES
+Partial
+NO
+NO
+NO
+Proactive agent action (not just reminders)
+YES
+NO
+NO
+NO
+NO
+Integrates with real university systems
+YES (Phase 2)
+YES
+IS the system
+NO
+NO
+Data stays in FERPA-compliant environment
+YES (IBM Cloud)
+YES
+YES
+NO
+NO
+Sensory campus navigation
+YES
+NO
+NO
+NO
+NO
+Scalable to 12 months
+YES (Kubernetes)
+NO (staffing constraint)
+N/A
+YES
+YES
+10. Known Limitations & Future Improvements
+Acknowledging limitations honestly demonstrates maturity and builds judge trust. This section directly satisfies the 'Issues & Improvements' hackathon requirement.
+Current Limitations (MVP)
+Document format coverage: 
+MVP supports clean PDFs and .docx syllabi. Scanned/image-based PDFs require OCR preprocessing — not yet implemented. Planned for Phase 1 using IBM Watson Document Understanding.
+ERP integration: 
+Financial aid and course data must be manually uploaded in MVP. IBM App Connect integration with Banner/PeopleSoft/Workday is Phase 2.
+Sensory map data depth: 
+MVP sensory map is seeded from class schedules and crowdsourced check-ins only. Real-time Wi-Fi occupancy integration requires campus IT data-sharing agreement — Phase 2.
+Mobile app: 
+MVP is web-only (React). Mobile app (React Native via Expo) is Phase 1 post-hackathon.
+Multi-language support: 
+MVP is English-only. Granite's multilingual capabilities enable this in Phase 2 for international students.
+Co-design validation: 
+Vantage has not yet been tested with a formal neurodivergent user cohort. This is the first priority of the Phase 1 pilot.
+Planned Improvements
+Watson Document Understanding: 
+Full OCR pipeline for scanned PDFs, handwritten syllabi, and image-embedded text.
+Accessibility audit tool: 
+A feature that allows students to flag inaccessible university documents, automatically generating an accessibility report that can be (with student permission) forwarded to the Disability Services office.
+Professor-facing layer: 
+An opt-in tool where professors can upload syllabi and receive an 'accessibility score' plus plain-language rewrite suggestions — preventing inaccessibility at the source.
+Peer support network: 
+Anonymous matching of students with similar CAP profiles for peer study groups — IBM Granite used to suggest compatible study partners based on learning style, not just course overlap.
+Outcome measurement dashboard: 
+A university administrator view (anonymised, aggregated only) showing retention trend data for students using Vantage vs. a control cohort — building the evidence base for institutional adoption.
+WHY VANTAGE WINS
+#
+Winning Criterion
+Vantage's Answer
+1
+Undeniable problem
+58% graduation rate. 50% dropout due to missing accommodations. These are not estimates — they are published, cited statistics.
+2
+Not just a chatbot
+WatsonX Orchestrate acts without student initiation. It doesn't answer questions — it executes multi-step workflows across integrated systems.
+3
+IBM tools are structural
+7 IBM tools, each powering a specific architectural component. Every tool name is traceable to an on-screen demo action.
+4
+Deployable, not theoretical
+Zero university rebuilds required. 90-day MVP. 12-month multi-university scale on IBM Cloud Kubernetes. Credible, phased, specific.
+5
+The human core is real
+You are not building a scheduling tool. You are building the thing that keeps a 19-year-old with ADHD from losing their financial aid because they couldn't find a PDF.
+"The form was always there. We just needed to make it findable."
+— Project Vantage, IBM SkillsBuild Hackathon 2025
