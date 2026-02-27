@@ -5,6 +5,7 @@ import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
 
 const FILTERS = ['All', 'Due This Week', 'High Priority']
+const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 }
 
 function isThisWeek(dateStr) {
   if (!dateStr) return false
@@ -17,13 +18,9 @@ function isThisWeek(dateStr) {
 
 function sortByDue(tasks) {
   return [...tasks].sort((a, b) => {
-<<<<<<< Updated upstream
-    if (!a.dueDate && !b.dueDate) return 0
-=======
     // Completed tasks always go last
     if (a.completed !== b.completed) return a.completed ? 1 : -1
     if (!a.dueDate && !b.dueDate) return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
->>>>>>> Stashed changes
     if (!a.dueDate) return 1
     if (!b.dueDate) return -1
     return new Date(a.dueDate) - new Date(b.dueDate)
@@ -67,8 +64,6 @@ export default function SyllabusPage() {
     return true
   }))
 
-<<<<<<< Updated upstream
-=======
   const importantDates = syllabus?.importantDates || []
   const policies = syllabus?.policies || null
 
@@ -92,7 +87,6 @@ export default function SyllabusPage() {
     )
   }
 
->>>>>>> Stashed changes
   return (
     <>
       <Navbar showNav={true} />
@@ -150,22 +144,37 @@ export default function SyllabusPage() {
           )}
         </div>
 
-        {/* Policies section */}
-        {syllabus?.policies && (
+        {/* Important Dates */}
+        {importantDates.length > 0 && (
+          <div style={{ maxWidth: '900px', margin: '0 auto 24px', padding: '0 24px' }}>
+            <h3 style={{ fontSize: '16px', color: '#161616', marginBottom: '12px' }}>Important Dates</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {importantDates.map((d, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#0F62FE', flexShrink: 0 }} />
+                  <span style={{ color: '#525252', fontSize: '14px', fontWeight: '600', minWidth: '70px' }}>
+                    {new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                  <span style={{ color: '#161616', fontSize: '14px' }}>{d.event}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Policies */}
+        {policies && (
           <div style={{ maxWidth: '900px', margin: '0 auto 32px', padding: '0 24px' }}>
-            <div style={{
-              backgroundColor: '#F4F4F4', borderRadius: '8px', padding: '20px',
-              border: '1px solid #E0E0E0'
-            }}>
+            <div style={{ backgroundColor: '#F4F4F4', borderRadius: '8px', padding: '20px', border: '1px solid #E0E0E0' }}>
               <h3 style={{ margin: '0 0 12px', fontSize: '16px', color: '#161616' }}>Course Policies</h3>
-              {syllabus.policies.attendance && (
+              {policies.attendance && (
                 <p style={{ margin: '0 0 6px', fontSize: '14px', color: '#525252' }}>
-                  <strong>Attendance:</strong> {syllabus.policies.attendance}
+                  <strong>Attendance:</strong> {policies.attendance}
                 </p>
               )}
-              {syllabus.policies.lateWork && (
+              {policies.lateWork && (
                 <p style={{ margin: 0, fontSize: '14px', color: '#525252' }}>
-                  <strong>Late Work:</strong> {syllabus.policies.lateWork}
+                  <strong>Late Work:</strong> {policies.lateWork}
                 </p>
               )}
             </div>
