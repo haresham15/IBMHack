@@ -1,0 +1,61 @@
+{
+  "feature_cols": [
+    "has_adhd",
+    "has_asd",
+    "has_dyslexia",
+    "has_dyscalculia",
+    "has_dyspraxia",
+    "has_spd",
+    "has_anxiety",
+    "n_disorders",
+    "light_sensitivity",
+    "sound_sensitivity",
+    "motion_sensitivity",
+    "support_level_enc",
+    "info_density_pref_enc",
+    "time_horizon_enc"
+  ],
+  "categorical_targets": [
+    "color_theme",
+    "font_family",
+    "font_size",
+    "motion",
+    "info_density"
+  ],
+  "binary_targets": [
+    "large_targets",
+    "read_aloud",
+    "progress_bars",
+    "no_timers"
+  ],
+  "label_classes": {
+    "color_theme": [
+      "calm",
+      "cream",
+      "dark",
+      "neutral",
+      "warm"
+    ],
+    "font_family": [
+      "atkinson",
+      "inter",
+      "lexend",
+      "nunito"
+    ],
+    "font_size": [
+      "default",
+      "large",
+      "xl"
+    ],
+    "motion": [
+      "off",
+      "on",
+      "reduced"
+    ],
+    "info_density": [
+      "full",
+      "minimal",
+      "moderate"
+    ]
+  }
+}
