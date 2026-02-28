@@ -81,9 +81,12 @@ function landmarkHTML(lm) {
 export default function CampusMap({
   destination = null,
   onDestinationClear,
-  onWaypointsReady,   // (steps[], totalDistM) → void
-  onCheckpointHit,    // (idx) → void
-  onPosUpdate,        // (lng, lat, remainingM) → void
+  onWaypointsReady,
+  onCheckpointHit,
+  onPosUpdate,
+  mapStyle = 'mapbox://styles/mapbox/streets-v12',
+  autoFocusMode = false,
+  disorders = [],
 }) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
@@ -102,7 +105,7 @@ export default function CampusMap({
   const [eta, setEta] = useState(null)
   const [routeLoading, setRouteLoading] = useState(false)
   const [geoError, setGeoError] = useState(null)
-  const [isFocusMode, setIsFocusMode] = useState(false)
+  const [isFocusMode, setIsFocusMode] = useState(autoFocusMode)
   const [anchorCount, setAnchorCount] = useState(0)
 
   const routeColor = destination
@@ -216,15 +219,20 @@ export default function CampusMap({
     const nearby = landmarksRef.current.filter(lm =>
       haversineM([lm.coordinates[0], lm.coordinates[1]], [destLng, destLat]) < 1500
     )
-    nearby.forEach(lm => {
+    // Filter by disorder tags when the user has disorders set
+    const filtered = disorders.length > 0
+      ? nearby.filter(lm => !lm.disorderTags || lm.disorderTags.length === 0 ||
+        lm.disorderTags.some(tag => disorders.includes(tag)))
+      : nearby
+    filtered.forEach(lm => {
       const el = document.createElement('div')
       el.innerHTML = `<div style="background:linear-gradient(135deg,#0050CC,#0070FF);color:#fff;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;box-shadow:0 0 0 4px rgba(0,112,255,.3),0 2px 8px rgba(0,0,0,.25);border:2px solid #fff">${lm.emoji}</div>`
       const popup = new mapboxgl.Popup({ offset: 20, maxWidth: '260px', className: 'landmark-popup' }).setHTML(landmarkHTML(lm))
       const marker = new mapboxgl.Marker({ element: el, anchor: 'center' }).setLngLat(lm.coordinates).setPopup(popup).addTo(map)
       anchorMarkersRef.current.push(marker)
     })
-    setAnchorCount(nearby.length)
-  }, [clearLandmarks])
+    setAnchorCount(filtered.length)
+  }, [clearLandmarks, disorders])
 
   // ── Intersection proximity check ───────────────────────────────────────
   // Fires onCheckpointHit(idx) within 15m of each waypoint (in Focus Mode only)
@@ -342,7 +350,7 @@ export default function CampusMap({
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: mapStyle,
       center: [OSU_LNG, OSU_LAT], zoom: DEFAULT_ZOOM,
       pitch: DEFAULT_PITCH, bearing: DEFAULT_BEARING, antialias: true
     })

@@ -167,21 +167,56 @@ export default function CampusMapPage() {
   const categories = ['All', ...LOCATIONS.map(c => c.category)]
   const activeColor = selectedDestination ? routeColorFromType(selectedDestination.type) : '#bb0000'
 
+  // ── ML Config from sessionStorage / localStorage ─────────────────────────
+  const [mlConfig, setMlConfig] = useState(null)
+  const [disorders, setDisorders] = useState([])
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('vantage_ui_config')
+      if (stored) setMlConfig(JSON.parse(stored))
+    } catch { }
+    try {
+      const d = localStorage.getItem('vantage_disorders')
+      if (d) setDisorders(JSON.parse(d))
+    } catch { }
+  }, [])
+
+  // Derive map style from color theme
+  const mapStyle = useMemo(() => {
+    if (mlConfig?.color_theme === 'dark') return 'mapbox://styles/mapbox/dark-v11'
+    if (mlConfig?.color_theme === 'cream' || mlConfig?.color_theme === 'warm') return 'mapbox://styles/mapbox/outdoors-v12'
+    return 'mapbox://styles/mapbox/streets-v12'
+  }, [mlConfig])
+
+  // Auto-enable Focus Mode for ADHD/ASD
+  const autoFocusMode = disorders.includes('adhd') || disorders.includes('asd')
+
+  // Noise sensitivity: pre-filter to quiet places for SPD/ASD/anxiety
+  const noiseSensitive = disorders.some(d => ['spd', 'asd', 'anxiety'].includes(d))
+
   const filteredLocations = useMemo(() => {
     const q = searchQuery.toLowerCase()
     return LOCATIONS
       .filter(cat => categoryFilter === 'All' || cat.category === categoryFilter)
       .map(cat => ({
         ...cat,
-        places: cat.places.filter(p =>
-          p.name.toLowerCase().includes(q) ||
-          p.desc.toLowerCase().includes(q) ||
-          p.tag.toLowerCase().includes(q) ||
-          (p.navDesc?.toLowerCase().includes(q) ?? false)
-        )
+        places: cat.places
+          .filter(p =>
+            p.name.toLowerCase().includes(q) ||
+            p.desc.toLowerCase().includes(q) ||
+            p.tag.toLowerCase().includes(q) ||
+            (p.navDesc?.toLowerCase().includes(q) ?? false)
+          )
+          // Quiet-first sort for noise-sensitive profiles
+          .sort((a, b) => {
+            if (!noiseSensitive) return 0
+            const nOrder = { low: 0, medium: 1, high: 2 }
+            return (nOrder[a.noiseLevel] ?? 1) - (nOrder[b.noiseLevel] ?? 1)
+          })
       }))
       .filter(cat => cat.places.length > 0)
-  }, [searchQuery, categoryFilter])
+  }, [searchQuery, categoryFilter, noiseSensitive])
 
   // ── Callbacks from CampusMap ─────────────────────────────────────────────
   const handleWaypointsReady = useCallback((steps, distM) => {
@@ -461,6 +496,9 @@ export default function CampusMapPage() {
               onWaypointsReady={handleWaypointsReady}
               onCheckpointHit={handleCheckpointHit}
               onPosUpdate={handlePosUpdate}
+              mapStyle={mapStyle}
+              autoFocusMode={autoFocusMode}
+              disorders={disorders}
             />
           </div>
         </div>
@@ -512,6 +550,29 @@ export default function CampusMapPage() {
               </p>
             </div>
           </div>
+
+          {/* ML Recommendation Banner */}
+          {disorders.length > 0 && (
+            <div style={{
+              backgroundColor: noiseSensitive ? '#EDF5FF' : '#DEFBE6',
+              border: `1px solid ${noiseSensitive ? '#BAE6FF' : '#A7F0BA'}`,
+              borderRadius: '10px', padding: '12px 18px', marginBottom: '20px',
+              display: 'flex', alignItems: 'flex-start', gap: '12px'
+            }}>
+              <span style={{ fontSize: '22px', flexShrink: 0 }}>🧠</span>
+              <div>
+                <div style={{ fontWeight: '700', fontSize: '14px', color: '#161616', marginBottom: '4px' }}>
+                  AI-personalised campus view
+                </div>
+                <div style={{ fontSize: '13px', color: '#525252', lineHeight: 1.5 }}>
+                  {noiseSensitive
+                    ? 'Quiet spaces are sorted first based on your sensory profile. Focus Mode is ' + (autoFocusMode ? 'auto-enabled' : 'available') + ' on the map.'
+                    : 'Landmark anchors on your route will be filtered to locations most relevant to your profile.'}
+                  {' '}Map style: <strong>{mlConfig?.color_theme ?? 'default'}</strong>.
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Search + filter */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
