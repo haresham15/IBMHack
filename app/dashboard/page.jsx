@@ -5,6 +5,7 @@ import AgentAlert from '@/components/AgentAlert'
 import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/lib/supabase/client'
+import { useUIConfig } from '@/lib/useUIConfig'
 
 function timeOfDay() {
   const h = new Date().getHours()
@@ -46,7 +47,10 @@ export default function DashboardPage() {
   const [alert, setAlert] = useState(null)
   const [tasks, setTasks] = useState([])
   const [syllabi, setSyllabi] = useState([])
-  const [activeTab, setActiveTab] = useState(null) // syllabus id
+  const [activeTab, setActiveTab] = useState(null)
+
+  // ── ML Theme ──────────────────────────────────────────────────────────────
+  const { theme } = useUIConfig(capProfile)
 
   useEffect(() => {
     const supabase = createClient()
@@ -63,13 +67,15 @@ export default function DashboardPage() {
 
       if (!cap) { router.push('/onboarding'); return }
 
-      setCapProfile({
+      const capObj = {
         displayName: cap.display_name,
         informationDensity: cap.information_density,
         timeHorizon: cap.time_horizon,
         sensoryFlags: cap.sensory_flags,
-        supportLevel: cap.support_level
-      })
+        supportLevel: cap.support_level,
+        disorders: cap.disorders || [],
+      }
+      setCapProfile(capObj)
 
       const { data: syllabusRows } = await supabase
         .from('syllabi')
@@ -79,34 +85,23 @@ export default function DashboardPage() {
 
       if (syllabusRows && syllabusRows.length > 0) {
         const mapped = syllabusRows.map(s => ({
-          id: s.id,
-          courseName: s.course_name,
-          instructor: s.instructor,
-          term: s.term,
-          uploadedAt: s.uploaded_at
+          id: s.id, courseName: s.course_name,
+          instructor: s.instructor, term: s.term, uploadedAt: s.uploaded_at
         }))
         setSyllabi(mapped)
         setActiveTab(mapped[0].id)
 
-        const syllabusIds = syllabusRows.map(s => s.id)
         const { data: taskRows } = await supabase
-          .from('tasks')
-          .select('*')
-          .in('syllabus_id', syllabusIds)
+          .from('tasks').select('*')
+          .in('syllabus_id', syllabusRows.map(s => s.id))
 
         if (taskRows) {
           setTasks(taskRows.map(t => ({
-            id: t.id,
-            syllabusId: t.syllabus_id,
-            title: t.title,
-            plainEnglishDescription: t.plain_english_description,
-            dueDate: t.due_date,
-            priority: t.priority,
-            estimatedMinutes: t.estimated_minutes,
-            confidence: t.confidence,
-            steps: t.steps,
-            type: t.type,
-            completed: t.completed
+            id: t.id, syllabusId: t.syllabus_id,
+            title: t.title, plainEnglishDescription: t.plain_english_description,
+            dueDate: t.due_date, priority: t.priority,
+            estimatedMinutes: t.estimated_minutes, confidence: t.confidence,
+            steps: t.steps, type: t.type, completed: t.completed
           })))
         }
       }
@@ -138,75 +133,85 @@ export default function DashboardPage() {
   const tabTasks = activeTab
     ? sortByDue(filterByTimeHorizon(tasks.filter(t => t.syllabusId === activeTab), capProfile.timeHorizon))
     : []
-
   const completedCount = tabTasks.filter(t => t.completed).length
-  const totalCount = tabTasks.length
+
+  // ── Theme-derived values ──────────────────────────────────────────────────
+  const minTarget = theme.largeTargets ? '52px' : '44px'
+  const motionCSS = theme.reduceMotion
+    ? '@media (prefers-reduced-motion: no-preference) { * { transition-duration: 0ms !important; animation-duration: 0ms !important; } }'
+    : ''
 
   return (
     <>
       <style>{`
+        :root {
+          --bg:       ${theme.bg};
+          --bg-alt:   ${theme.bgAlt};
+          --text:     ${theme.text};
+          --accent:   ${theme.accent};
+          --surface:  ${theme.surface};
+          --border:   ${theme.border};
+          --subtext:  ${theme.subtext};
+          --font:     ${theme.fontFamily};
+          --fz-body:  ${theme.fontSize};
+          --fz-head:  ${theme.fontSizeH};
+          --fz-small: ${theme.fontSizeS};
+          --lh:       ${theme.lineHeight};
+          --min-tap:  ${minTarget};
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--font); }
         .course-tab {
-          border: none;
-          cursor: pointer;
-          font-family: 'IBM Plex Sans', sans-serif;
-          font-size: 14px;
-          font-weight: 600;
-          padding: 10px 20px;
-          white-space: nowrap;
+          border: none; cursor: pointer; font-family: var(--font);
+          font-size: var(--fz-small); font-weight: 600;
+          padding: 10px 20px; white-space: nowrap;
           transition: background 150ms, color 150ms, border-bottom 150ms;
           border-bottom: 3px solid transparent;
-          background: transparent;
+          background: transparent; min-height: var(--min-tap);
+          color: var(--subtext);
         }
-        .course-tab:hover:not(.active-tab) {
-          background: rgba(15,98,254,0.07);
-          color: #0F62FE;
-        }
-        .active-tab {
-          color: #0F62FE;
-          border-bottom: 3px solid #0F62FE;
-          background: rgba(15,98,254,0.06);
-        }
-        .add-tab {
-          color: #0F62FE;
-          font-size: 13px;
-          font-weight: 600;
-        }
+        .course-tab:hover:not(.active-tab) { background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--accent); }
+        .active-tab { color: var(--accent); border-bottom: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+        ${motionCSS}
       `}</style>
 
       <Navbar showNav={true} />
-      <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4' }}>
+      <div style={{ paddingTop: '48px', fontFamily: 'var(--font)', minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
 
         {/* Greeting bar */}
         <div style={{
-          background: 'linear-gradient(135deg, #0F62FE, #001D6C)',
-          color: '#FFFFFF',
-          padding: '28px 32px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          background: `linear-gradient(135deg, ${theme.accent}, color-mix(in srgb, ${theme.accent} 40%, #001D6C))`,
+          color: '#FFFFFF', padding: '28px 32px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
           <div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 'var(--fz-head)', fontWeight: 'bold', lineHeight: 'var(--lh)' }}>
               Good {timeOfDay()}, {capProfile.displayName}.
             </div>
-            <div style={{ fontSize: '14px', color: '#93C5FD', marginTop: '4px' }}>{formatDate()}</div>
+            <div style={{ fontSize: 'var(--fz-small)', opacity: 0.8, marginTop: '4px' }}>{formatDate()}</div>
           </div>
-          <button
-            onClick={handleSignOut}
-            style={{
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              color: '#FFFFFF',
-              borderRadius: '6px',
-              padding: '8px 16px',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '500'
-            }}
-          >
-            Sign out
-          </button>
+          <button onClick={handleSignOut} style={{
+            background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
+            color: '#FFFFFF', borderRadius: '6px', padding: '8px 16px',
+            cursor: 'pointer', fontSize: 'var(--fz-small)', fontWeight: '500',
+            minHeight: 'var(--min-tap)'
+          }}>Sign out</button>
         </div>
+
+        {/* ML config badge */}
+        {theme.raw && (
+          <div style={{
+            backgroundColor: 'var(--bg-alt)', borderBottom: '1px solid var(--border)',
+            padding: '6px 24px', fontSize: '11px', color: 'var(--subtext)',
+            display: 'flex', gap: '16px', alignItems: 'center'
+          }}>
+            <span>🧠 AI-personalised UI</span>
+            <span>Theme: <b>{theme.raw.color_theme}</b></span>
+            <span>Font: <b>{theme.raw.font_family} {theme.raw.font_size}</b></span>
+            <span>Motion: <b>{theme.raw.motion}</b></span>
+            {theme.readAloud && <span>🔊 Read-aloud</span>}
+            {theme.noTimers && <span>⏱ No timers</span>}
+          </div>
+        )}
 
         {/* Agent Alert */}
         {alert && (
@@ -219,21 +224,21 @@ export default function DashboardPage() {
         {syllabi.length === 0 ? (
           <div style={{ maxWidth: '900px', margin: '32px auto', padding: '0 24px' }}>
             <div style={{
-              backgroundColor: '#FFFFFF', borderRadius: '12px',
+              backgroundColor: 'var(--surface)', borderRadius: '12px',
               padding: '56px 48px', textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+              border: '1px solid var(--border)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
             }}>
               <div style={{ fontSize: '56px', marginBottom: '16px' }}>&#x1F393;</div>
-              <div style={{ fontWeight: 'bold', fontSize: '18px', color: '#161616', marginBottom: '12px' }}>
+              <div style={{ fontWeight: 'bold', fontSize: 'var(--fz-head)', color: 'var(--text)', marginBottom: '12px' }}>
                 Upload your first syllabus
               </div>
-              <div style={{ color: '#525252', marginBottom: '24px' }}>
+              <div style={{ color: 'var(--subtext)', marginBottom: '24px', fontSize: 'var(--fz-body)', lineHeight: 'var(--lh)' }}>
                 Vantage will turn it into a personalised task list.
               </div>
               <button onClick={() => router.push('/upload')} style={{
-                backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
-                borderRadius: '8px', padding: '12px 28px', fontSize: '15px',
-                fontWeight: '600', cursor: 'pointer'
+                backgroundColor: 'var(--accent)', color: '#FFFFFF', border: 'none',
+                borderRadius: '8px', padding: '12px 28px', fontSize: 'var(--fz-body)',
+                fontWeight: '600', cursor: 'pointer', minHeight: 'var(--min-tap)'
               }}>Upload a Syllabus</button>
             </div>
           </div>
@@ -241,76 +246,64 @@ export default function DashboardPage() {
           <>
             {/* Course tab bar */}
             <div style={{
-              backgroundColor: '#FFFFFF',
-              borderBottom: '1px solid #E0E0E0',
-              overflowX: 'auto',
-              display: 'flex',
-              alignItems: 'stretch',
-              paddingLeft: '16px',
-              gap: '0'
+              backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)',
+              overflowX: 'auto', display: 'flex', alignItems: 'stretch', paddingLeft: '16px'
             }}>
               {syllabi.map(s => (
-                <button
-                  key={s.id}
+                <button key={s.id}
                   className={`course-tab${activeTab === s.id ? ' active-tab' : ''}`}
-                  onClick={() => setActiveTab(s.id)}
-                >
+                  onClick={() => setActiveTab(s.id)}>
                   {s.courseName}
                 </button>
               ))}
-              <button
-                className="course-tab add-tab"
+              <button className="course-tab"
                 onClick={() => router.push('/upload')}
-                style={{ marginLeft: '4px' }}
-              >
+                style={{ color: 'var(--accent)', marginLeft: '4px' }}>
                 + Add Course
               </button>
             </div>
 
-            {/* Active course content */}
             {activeSyllabus && (
               <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px' }}>
 
-                {/* Course meta + link */}
+                {/* Course meta */}
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
                   marginBottom: '20px', flexWrap: 'wrap', gap: '12px'
                 }}>
                   <div>
-                    <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#161616' }}>
+                    <h2 style={{ margin: 0, fontSize: 'var(--fz-head)', fontWeight: 'bold', color: 'var(--text)' }}>
                       {activeSyllabus.courseName}
                     </h2>
-                    <div style={{ fontSize: '13px', color: '#525252', marginTop: '4px' }}>
+                    <div style={{ fontSize: 'var(--fz-small)', color: 'var(--subtext)', marginTop: '4px', lineHeight: 'var(--lh)' }}>
                       {[activeSyllabus.instructor, activeSyllabus.term].filter(Boolean).join(' · ')}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    {/* Progress pill */}
-                    {totalCount > 0 && (
+                    {tabTasks.length > 0 && (
                       <div style={{
-                        backgroundColor: completedCount === totalCount ? '#D6F0E0' : '#EFF4FF',
-                        color: completedCount === totalCount ? '#198038' : '#0F62FE',
+                        backgroundColor: completedCount === tabTasks.length
+                          ? 'color-mix(in srgb, #198038 15%, transparent)'
+                          : 'color-mix(in srgb, var(--accent) 10%, transparent)',
+                        color: completedCount === tabTasks.length ? '#198038' : 'var(--accent)',
                         borderRadius: '12px', padding: '4px 12px',
-                        fontSize: '13px', fontWeight: '600'
+                        fontSize: 'var(--fz-small)', fontWeight: '600'
                       }}>
-                        {completedCount}/{totalCount} done
+                        {completedCount}/{tabTasks.length} done
                       </div>
                     )}
-                    <button
-                      onClick={() => router.push(`/syllabus/${activeSyllabus.id}`)}
-                      style={{
-                        background: 'none', border: '1px solid #0F62FE',
-                        color: '#0F62FE', borderRadius: '6px',
-                        padding: '6px 14px', cursor: 'pointer',
-                        fontSize: '13px', fontWeight: '600'
-                      }}>
-                      View all tasks →
-                    </button>
+                    <button onClick={() => router.push(`/syllabus/${activeSyllabus.id}`)} style={{
+                      background: 'none', border: `1px solid var(--accent)`,
+                      color: 'var(--accent)', borderRadius: '6px',
+                      padding: '6px 14px', cursor: 'pointer',
+                      fontSize: 'var(--fz-small)', fontWeight: '600',
+                      minHeight: 'var(--min-tap)'
+                    }}>View all tasks →</button>
                   </div>
                 </div>
 
                 {/* Time horizon label */}
-                <div style={{ fontSize: '13px', color: '#525252', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ fontSize: 'var(--fz-small)', color: 'var(--subtext)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px', lineHeight: 'var(--lh)' }}>
                   <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#198038' }} />
                   Upcoming within your {capProfile.timeHorizon} time horizon
                 </div>
@@ -318,18 +311,14 @@ export default function DashboardPage() {
                 {/* Task grid */}
                 {tabTasks.length === 0 ? (
                   <div style={{
-                    backgroundColor: '#FFFFFF', borderRadius: '8px',
-                    padding: '40px', textAlign: 'center', color: '#525252',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
+                    backgroundColor: 'var(--surface)', borderRadius: '8px',
+                    padding: '40px', textAlign: 'center', color: 'var(--subtext)',
+                    border: '1px solid var(--border)'
                   }}>
                     No tasks due in your current time window. &#x1F389;
                   </div>
                 ) : (
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-                    gap: '12px'
-                  }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '12px' }}>
                     {tabTasks.map(task => (
                       <TaskCard key={task.id} task={task} onComplete={handleComplete} />
                     ))}
@@ -340,8 +329,7 @@ export default function DashboardPage() {
           </>
         )}
 
-        {/* Footer */}
-        <div style={{ textAlign: 'center', color: '#525252', fontSize: '11px', padding: '12px', borderTop: '1px solid #E0E0E0', marginTop: '32px' }}>
+        <div style={{ textAlign: 'center', color: 'var(--subtext)', fontSize: '11px', padding: '12px', borderTop: '1px solid var(--border)', marginTop: '32px' }}>
           Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
         </div>
       </div>
