@@ -157,7 +157,7 @@ export default function OnboardingPage() {
         {/* Header */}
         <div style={{ padding: '32px 24px 16px', textAlign: 'center', position: 'relative' }}>
           <button onClick={() => router.back()} style={{
-            position: 'absolute', left: '24px', top: '36px',
+            position: 'fixed', top: '16px', left: '16px',
             background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
             borderRadius: '8px', padding: '6px 14px', color: '#FFFFFF',
             fontSize: '13px', fontWeight: '600', cursor: 'pointer',
