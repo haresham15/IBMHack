@@ -318,7 +318,7 @@ export default function DashboardPage() {
                     No tasks due in your current time window. &#x1F389;
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: theme.raw?.font_size === 'xl' ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))', gap: theme.raw?.font_size === 'xl' ? '16px' : '12px' }}>
                     {tabTasks.map(task => (
                       <TaskCard key={task.id} task={task} onComplete={handleComplete} />
                     ))}
