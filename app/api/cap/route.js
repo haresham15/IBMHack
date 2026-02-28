@@ -48,7 +48,8 @@ export async function POST(request) {
     information_density: capResult.informationDensity,
     time_horizon: capResult.timeHorizon,
     sensory_flags: capResult.sensoryFlags,
-    support_level: capResult.supportLevel
+    support_level: capResult.supportLevel,
+    disorders: capResult.disorders ?? []
   }, { onConflict: 'user_id' })
 
   if (dbError) {
@@ -64,7 +65,8 @@ export async function POST(request) {
       informationDensity: capResult.informationDensity,
       timeHorizon: capResult.timeHorizon,
       sensoryFlags: capResult.sensoryFlags,
-      supportLevel: capResult.supportLevel
+      supportLevel: capResult.supportLevel,
+      disorders: capResult.disorders ?? []
     }
   })
 }

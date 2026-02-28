@@ -3,24 +3,42 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const CAP_QUESTIONS = [
-  { id: 'q1', field: 'informationDensity',
+  {
+    id: 'q1', field: 'informationDensity',
     question: 'When you get instructions, do you prefer:',
     type: 'single', options: ['Just the key points', 'Moderate detail', 'Full step-by-step'],
-    values: ['summary', 'moderate', 'full'] },
-  { id: 'q2', field: 'timeHorizon',
+    values: ['summary', 'moderate', 'full']
+  },
+  {
+    id: 'q2', field: 'timeHorizon',
     question: 'How far ahead do you want deadline reminders?',
     type: 'single', options: ['24 hours ahead', '72 hours ahead', '1 week ahead', '2 weeks ahead'],
-    values: ['24h', '72h', '1week', '2weeks'] },
-  { id: 'q3', field: 'sensoryFlags',
+    values: ['24h', '72h', '1week', '2weeks']
+  },
+  {
+    id: 'q3', field: 'sensoryFlags',
     question: 'Do any of these make it hard to focus? (pick all that apply)',
     type: 'multi', options: ['Loud spaces', 'Bright lighting', 'Crowded rooms', 'Open offices'],
-    values: ['loud', 'bright', 'crowds', 'open'] },
-  { id: 'q4', field: 'supportLevel',
+    values: ['loud', 'bright', 'crowds', 'open']
+  },
+  {
+    id: 'q4', field: 'supportLevel',
     question: 'When it comes to tasks, I prefer:',
     type: 'single', options: ['Just reminders', 'Step-by-step guidance', 'Help completing it'],
-    values: ['reminder', 'step-by-step', 'full-agent'] },
-  { id: 'q5', field: 'displayName', question: 'What should Vantage call you?',
-    type: 'text', options: null, values: null }
+    values: ['reminder', 'step-by-step', 'full-agent']
+  },
+  {
+    id: 'q6', field: 'disorders',
+    question: 'Vantage can personalise your whole experience — colours, fonts, layout — to suit how your brain works best. Do any of these apply to you? (completely optional & private)',
+    type: 'multi',
+    options: ['ADHD', 'Autism / ASD', 'Dyslexia', 'Dyscalculia', 'Dyspraxia / DCD', 'Sensory Processing Disorder', 'Anxiety'],
+    values: ['adhd', 'asd', 'dyslexia', 'dyscalculia', 'dyspraxia', 'spd', 'anxiety'],
+    optional: true
+  },
+  {
+    id: 'q5', field: 'displayName', question: 'What should Vantage call you?',
+    type: 'text', options: null, values: null
+  }
 ]
 
 export default function OnboardingPage() {
@@ -160,9 +178,11 @@ export default function OnboardingPage() {
           ))}
 
           {showTyping && (
-            <div style={{ display: 'flex', gap: '5px', padding: '12px 16px', backgroundColor: '#F4F4F4',
-              borderRadius: '12px 12px 12px 0', width: 'fit-content', animation: 'fadeIn 200ms ease' }}>
-              {[0,1,2].map(i => (
+            <div style={{
+              display: 'flex', gap: '5px', padding: '12px 16px', backgroundColor: '#F4F4F4',
+              borderRadius: '12px 12px 12px 0', width: 'fit-content', animation: 'fadeIn 200ms ease'
+            }}>
+              {[0, 1, 2].map(i => (
                 <div key={i} style={{
                   width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0F62FE',
                   animation: `dot-pulse 1.2s ease-in-out ${i * 0.2}s infinite`
@@ -226,11 +246,20 @@ export default function OnboardingPage() {
                     )
                   })}
                 </div>
-                <button onClick={handleMultiContinue} style={{
-                  backgroundColor: '#0F62FE', color: '#FFFFFF',
-                  border: 'none', borderRadius: '20px', padding: '10px 24px',
-                  cursor: 'pointer', fontSize: '14px', fontWeight: '600'
-                }}>Continue &#x2192;</button>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <button onClick={handleMultiContinue} style={{
+                    backgroundColor: '#0F62FE', color: '#FFFFFF',
+                    border: 'none', borderRadius: '20px', padding: '10px 24px',
+                    cursor: 'pointer', fontSize: '14px', fontWeight: '600'
+                  }}>Continue &#x2192;</button>
+                  {currentQ.optional && (
+                    <button onClick={() => handleAnswer([], 'Prefer not to say')} style={{
+                      background: 'none', border: 'none',
+                      color: '#6B6B6B', cursor: 'pointer',
+                      fontSize: '13px', textDecoration: 'underline', padding: '4px'
+                    }}>Skip / prefer not to say</button>
+                  )}
+                </div>
               </div>
             )}
 
