@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import AgentAlert from '@/components/AgentAlert'
 import TaskCard from '@/components/TaskCard'
 import Navbar from '@/components/Navbar'
 import { createClient } from '@/lib/supabase/client'
@@ -106,7 +105,6 @@ export default function DashboardPage() {
         }
       }
 
-      fetch('/api/agent').then(r => r.json()).then(setAlert).catch(() => { })
     }
 
     loadData()
@@ -214,11 +212,6 @@ export default function DashboardPage() {
         )}
 
         {/* Agent Alert */}
-        {alert && (
-          <div style={{ maxWidth: '900px', margin: '16px auto 0', padding: '0 24px' }}>
-            <AgentAlert alert={alert} onAction={() => router.push('/agent')} />
-          </div>
-        )}
 
         {/* Empty state */}
         {syllabi.length === 0 ? (

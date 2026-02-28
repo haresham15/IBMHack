@@ -7,7 +7,6 @@ const LINKS = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/campus-map', label: 'Campus Map' },
   { href: '/upload', label: 'Syllabi' },
-  { href: '/agent', label: 'AI Agent' },
   { href: '/onboarding', label: 'My Profile' },
 ]
 
