@@ -57,8 +57,13 @@ function fmtDist(m) {
 // ── line-gradient expression ───────────────────────────────────────────────
 function buildGradient(color, focus) {
   if (!focus) return ['interpolate', ['linear'], ['line-progress'], 0, color + 'AA', 1, color]
+  // Focus mode: full-brightness white gradient — white is unaffected by
+  // CSS grayscale filter, so the route appears at maximum luminance on the
+  // dark fog map ("full capacity").
   return ['interpolate', ['linear'], ['line-progress'],
-    0, 'rgba(180,220,255,0.2)', 0.3, color, 0.7, '#80D8FF', 1, '#FFFFFF']
+    0, 'rgba(255,255,255,0.55)',
+    0.25, '#FFFFFF',
+    1, '#FFFFFF']
 }
 
 // ── Landmark anchor popup ──────────────────────────────────────────────────
@@ -463,13 +468,23 @@ export default function CampusMap({
       go(userPosRef.current.lng, userPosRef.current.lat)
     } else {
       map.flyTo({ center: [destination.lng, destination.lat], zoom: 17, pitch: 55, duration: 1400 })
+      let geoReceived = false
       const onGeo = e => {
+        geoReceived = true
         userPosRef.current = { lng: e.coords.longitude, lat: e.coords.latitude }
         go(e.coords.longitude, e.coords.latitude)
         geoCtrlRef.current?.off('geolocate', onGeo)
       }
       geoCtrlRef.current?.on('geolocate', onGeo)
       setTimeout(() => geoCtrlRef.current?.trigger(), 200)
+      // Fallback: if GPS not received within 4s, route from OSU campus centre
+      // so the path is always visible even without location permission.
+      setTimeout(() => {
+        if (!geoReceived && !userPosRef.current) {
+          geoCtrlRef.current?.off('geolocate', onGeo)
+          go(OSU_LNG, OSU_LAT)
+        }
+      }, 4000)
     }
   }, [destination, drawRoute, clearRoute, clearLandmarks, applyFogOfWar, showLandmarks, onWaypointsReady, routeColor])
 
@@ -489,16 +504,46 @@ export default function CampusMap({
         .intersection-popup .mapboxgl-popup-close-button { font-size:18px;padding:4px 8px;color:#525252; }
         @keyframes spin { to{transform:rotate(360deg);} }
         @keyframes focusPulse { 0%,100%{opacity:1;}50%{opacity:.7;} }
+
+        /* ── Focus Mode: desaturate ONLY the WebGL canvas, not DOM siblings ─── */
+        /* The user-location dot / accuracy-circle are sibling divs next to the  */
+        /* canvas inside .mapboxgl-canvas-container — they are NOT inside canvas, */
+        /* so this filter does NOT affect them.                                   */
+        .mapbox-focus-mode canvas.mapboxgl-canvas {
+          filter: grayscale(78%) brightness(0.6) contrast(1.05);
+          transition: filter 700ms ease;
+        }
+
+        /* Ensure user location elements are always at FULL brightness/color,    */
+        /* even when a parent div might carry a stacking-context filter.          */
+        .mapboxgl-user-location-dot,
+        .mapboxgl-user-location-accuracy-circle,
+        .mapboxgl-user-location-heading {
+          filter: none !important;
+          opacity: 1 !important;
+        }
+
+        /* Extra pulse ring in Focus Mode — makes the dot unmissable */
+        .mapbox-focus-mode .mapboxgl-user-location-dot {
+          box-shadow: 0 0 0 4px rgba(30,144,255,0.55),
+                      0 0 0 8px rgba(30,144,255,0.25) !important;
+        }
+
+        /* Ensure Mapbox accuracy circle stays visible */
+        .mapbox-focus-mode .mapboxgl-user-location-accuracy-circle {
+          border-color: rgba(30,144,255,0.5) !important;
+        }
       `}</style>
 
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
 
-        {/* Map canvas — CSS filter for Focus grayscale */}
-        <div ref={containerRef} style={{
-          width: '100%', height: '100%',
-          filter: isFocusMode ? 'grayscale(75%) brightness(0.62) contrast(1.05)' : 'none',
-          transition: 'filter 700ms ease'
-        }} />
+        {/* Map canvas — grayscale applied via CSS class (targets canvas only, */}
+        {/* NOT the user-location-dot which is a sibling of the canvas element) */}
+        <div
+          ref={containerRef}
+          className={isFocusMode ? 'mapbox-focus-mode' : undefined}
+          style={{ width: '100%', height: '100%' }}
+        />
 
         {/* Focus Mode active banner */}
         {isFocusMode && (
