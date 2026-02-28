@@ -606,7 +606,7 @@ export default function CampusMapPage() {
           </div>
 
           {filteredLocations.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '48px 24px', color: '#525252', fontSize: '15px', backgroundColor: '#FFFFFF', borderRadius: '12px' }}>
+            <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--subtext, #525252)', fontSize: 'var(--fz-body, 15px)', backgroundColor: 'var(--surface, #FFFFFF)', borderRadius: '12px' }}>
               No locations match "<strong>{searchQuery}</strong>"
             </div>
           )}
@@ -615,8 +615,8 @@ export default function CampusMapPage() {
             <div key={cat.category} style={{ marginBottom: '32px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                 <span style={{ fontSize: '20px' }}>{cat.icon}</span>
-                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: '#161616' }}>{cat.category}</h3>
-                <span style={{ fontSize: '12px', color: '#6F6F6F', backgroundColor: '#E8E8E8', borderRadius: '10px', padding: '1px 8px' }}>{cat.places.length}</span>
+                <h3 style={{ margin: 0, fontSize: 'var(--fz-body, 16px)', fontWeight: '700', color: 'var(--text, #161616)' }}>{cat.category}</h3>
+                <span style={{ fontSize: 'var(--fz-small, 12px)', color: 'var(--subtext, #6F6F6F)', backgroundColor: 'var(--border, #E8E8E8)', borderRadius: '10px', padding: '1px 8px' }}>{cat.places.length}</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '12px' }}>
                 {cat.places.map(place => {
@@ -627,7 +627,7 @@ export default function CampusMapPage() {
                   return (
                     <div key={place.name} onClick={() => handleSelectDest(place)}
                       style={{
-                        backgroundColor: '#FFFFFF', borderRadius: '10px', padding: '14px 16px',
+                        backgroundColor: 'var(--surface, #FFFFFF)', borderRadius: '10px', padding: '14px 16px',
                         cursor: 'pointer',
                         border: isPending ? `2px solid ${cardColor}` : isActive ? `2px solid ${cardColor}` : '2px solid transparent',
                         boxShadow: isPending || isActive
@@ -639,7 +639,7 @@ export default function CampusMapPage() {
                       onMouseLeave={e => { if (!isPending && !isActive) e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#161616', lineHeight: 1.3, flex: 1 }}>{place.name}</div>
+                        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text, #161616)', lineHeight: 1.3, flex: 1 }}>{place.name}</div>
                         <span style={tagStyle(place.tag)}>{place.tag}</span>
                       </div>
                       <div style={{ fontSize: '12px', color: '#525252', lineHeight: 1.45 }}>{place.desc}</div>
