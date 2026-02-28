@@ -1,6 +1,7 @@
 import '@fontsource/ibm-plex-sans'
 import '@fontsource/ibm-plex-sans/600.css'
 import DemoReset from '@/components/DemoReset'
+import ThemeProvider from '@/components/ThemeProvider'
 
 export default function RootLayout({ children }) {
   return (
@@ -18,7 +19,9 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ fontFamily: 'var(--font, IBM Plex Sans, sans-serif)', margin: 0, backgroundColor: 'var(--bg, #F4F4F4)', color: 'var(--text, #161616)', transition: 'background-color 400ms ease, color 400ms ease' }}>
         <DemoReset />
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
