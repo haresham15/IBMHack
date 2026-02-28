@@ -1,9 +1,10 @@
 'use client'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import LoadingStages from '@/components/LoadingStages'
 import Navbar from '@/components/Navbar'
 import ErrorState from '@/components/ErrorState'
+import { createClient } from '@/lib/supabase/client'
 
 function formatSize(bytes) {
   if (bytes < 1024) return bytes + ' B'
@@ -13,116 +14,148 @@ function formatSize(bytes) {
 
 export default function UploadPage() {
   const router = useRouter()
-  const [file, setFile] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [typeError, setTypeError] = useState(false)
-  const [uploadError, setUploadError] = useState(null)
-  const [translateError, setTranslateError] = useState(null)
-  const [savedSyllabusId, setSavedSyllabusId] = useState(null)
-  const [checkmarkKey, setCheckmarkKey] = useState(0)
 
-  function handleFile(f) {
-    if (!f) return
-    if (f.type !== 'application/pdf') {
-      setTypeError(true)
-      return
+  // Multi-file queue
+  const [files, setFiles] = useState([])
+  const [isDragging, setIsDragging] = useState(false)
+  const [typeError, setTypeError] = useState(false)
+
+  // Processing state
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [processingIndex, setProcessingIndex] = useState(null) // which file is being processed
+  const [errors, setErrors] = useState([]) // per-file errors
+  const [capProfile, setCapProfile] = useState(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { router.push('/'); return }
+      const { data: cap } = await supabase
+        .from('cap_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      if (!cap) { router.push('/onboarding'); return }
+      setCapProfile({
+        displayName: cap.display_name,
+        informationDensity: cap.information_density,
+        timeHorizon: cap.time_horizon,
+        sensoryFlags: cap.sensory_flags,
+        supportLevel: cap.support_level
+      })
+    })
+  }, [router])
+
+  function addFiles(newFiles) {
+    const pdfs = Array.from(newFiles).filter(f => {
+      if (f.type !== 'application/pdf') { setTypeError(true); return false }
+      return true
+    })
+    if (pdfs.length > 0) {
+      setTypeError(false)
+      setErrors([])
+      setFiles(prev => {
+        // Deduplicate by name
+        const existing = new Set(prev.map(f => f.name))
+        return [...prev, ...pdfs.filter(f => !existing.has(f.name))]
+      })
     }
-    setTypeError(false)
-    setUploadError(null)
-    setTranslateError(null)
-    setSavedSyllabusId(null)
-    setFile(f)
-    setCheckmarkKey(k => k + 1)
+  }
+
+  function removeFile(index) {
+    setFiles(prev => prev.filter((_, i) => i !== index))
+    setErrors(prev => prev.filter((_, i) => i !== index))
   }
 
   const onDrop = useCallback(e => {
     e.preventDefault()
     setIsDragging(false)
-    handleFile(e.dataTransfer.files[0])
+    addFiles(e.dataTransfer.files)
   }, [])
 
-  const onDragOver = useCallback(e => {
-    e.preventDefault()
-    setIsDragging(true)
-  }, [])
-
+  const onDragOver = useCallback(e => { e.preventDefault(); setIsDragging(true) }, [])
   const onDragLeave = () => setIsDragging(false)
 
-  async function runTranslate(id, capProfile) {
-    setTranslateError(null)
-    try {
-      const res = await fetch('/api/syllabus/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ syllabusId: id, capProfile })
-      })
-      const result = await res.json()
-      if (!res.ok || result.error === 'AI_ERROR' || !result.tasks) throw new Error('AI_ERROR')
+  async function uploadAndTranslate(file, index, cap) {
+    // 1. Upload
+    const formData = new FormData()
+    formData.append('file', file)
+    const uploadRes = await fetch('/api/syllabus/upload', { method: 'POST', body: formData })
+    if (!uploadRes.ok) throw new Error('upload_failed')
+    const { syllabusId } = await uploadRes.json()
 
-      localStorage.setItem('vantage_tasks', JSON.stringify(result.tasks))
-      const existing = JSON.parse(localStorage.getItem('vantage_syllabi') || '[]')
-      existing.push({
-        id,
-        courseName: result.courseName,
+    // 2. Translate
+    const transRes = await fetch('/api/syllabus/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ syllabusId, capProfile: cap })
+    })
+    const result = await transRes.json()
+    if (!transRes.ok || result.error === 'AI_ERROR' || !result.tasks) throw new Error('ai_failed')
+
+    // 3. Save to Supabase
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const { data: sylRow, error: sylErr } = await supabase
+      .from('syllabi')
+      .insert({
+        user_id: user.id,
+        course_name: result.courseName,
         instructor: result.instructor,
-        term: result.term,
-        uploadedAt: new Date().toISOString()
+        term: result.term
       })
-      localStorage.setItem('vantage_syllabi', JSON.stringify(existing))
-      router.push('/syllabus/' + id)
-    } catch {
-      setTranslateError('Granite processing failed. Please try again.')
-      setIsProcessing(false)
-    }
+      .select('id')
+      .single()
+
+    if (sylErr) throw new Error('db_error')
+
+    const taskRows = result.tasks.map(t => ({
+      syllabus_id: sylRow.id,
+      user_id: user.id,
+      title: t.title,
+      plain_english_description: t.plainEnglishDescription,
+      due_date: t.dueDate || null,
+      priority: t.priority,
+      estimated_minutes: t.estimatedMinutes,
+      confidence: t.confidence,
+      steps: t.steps || [],
+      type: t.type,
+      completed: false
+    }))
+
+    await supabase.from('tasks').insert(taskRows)
+    return sylRow.id
   }
 
-  async function handleAnalyse() {
-    if (!file) return
-
-    const capRaw = localStorage.getItem('vantage_cap')
-    if (!capRaw) {
-      router.push('/onboarding')
-      return
-    }
-
+  async function handleAnalyseAll() {
+    if (files.length === 0 || !capProfile) return
     setIsProcessing(true)
-    setUploadError(null)
-    setTranslateError(null)
+    setErrors(new Array(files.length).fill(null))
 
-    let id = savedSyllabusId
-
-    if (!id) {
+    for (let i = 0; i < files.length; i++) {
+      setProcessingIndex(i)
       try {
-        const formData = new FormData()
-        formData.append('file', file)
-        const res = await fetch('/api/syllabus/upload', { method: 'POST', body: formData })
-        if (!res.ok) throw new Error('upload failed')
-        const data = await res.json()
-        id = data.syllabusId
-        setSavedSyllabusId(id)
-      } catch {
-        setUploadError('Upload failed. Please try again.')
-        setIsProcessing(false)
-        return
+        await uploadAndTranslate(files[i], i, capProfile)
+      } catch (err) {
+        setErrors(prev => {
+          const next = [...prev]
+          next[i] = err.message === 'upload_failed'
+            ? 'Upload failed — check your connection and try again.'
+            : err.message === 'ai_failed'
+              ? 'Granite processing failed — try again.'
+              : 'Something went wrong — please try again.'
+          return next
+        })
       }
     }
 
-    await runTranslate(id, JSON.parse(localStorage.getItem('vantage_cap')))
+    setProcessingIndex(null)
+    setIsProcessing(false)
+    router.push('/dashboard')
   }
 
-  async function retryTranslate() {
-    const capRaw = localStorage.getItem('vantage_cap')
-    if (!capRaw || !savedSyllabusId) return
-    setIsProcessing(true)
-    await runTranslate(savedSyllabusId, JSON.parse(capRaw))
-  }
-
-  async function retryUpload() {
-    setSavedSyllabusId(null)
-    setUploadError(null)
-    await handleAnalyse()
-  }
+  const hasErrors = errors.some(Boolean)
 
   return (
     <>
@@ -134,100 +167,131 @@ export default function UploadPage() {
         }
         .check-anim { animation: checkPop 400ms ease-out forwards; }
         .analyse-btn:active:not(:disabled) { transform: scale(0.97); }
+        .file-row:hover .remove-btn { opacity: 1 !important; }
       `}</style>
 
       <Navbar showNav={true} />
       <LoadingStages active={isProcessing} />
 
-      <div style={{
-        fontFamily: 'IBM Plex Sans, sans-serif',
-        maxWidth: '640px', margin: '0 auto', padding: '80px 24px 40px'
-      }}>
+      <div style={{ fontFamily: 'IBM Plex Sans, sans-serif', maxWidth: '640px', margin: '0 auto', padding: '80px 24px 40px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#161616', marginBottom: '8px' }}>
-          Upload a Syllabus
+          Add Courses
         </h1>
-        <p style={{ color: '#525252', marginBottom: '32px' }}>
-          Vantage will read it and create a personalised task list for you.
+        <p style={{ color: '#525252', marginBottom: '28px' }}>
+          Upload one or more syllabus PDFs — Vantage will create a personalised task list for each class.
         </p>
-
-        {uploadError && (
-          <div style={{ marginBottom: '20px' }}>
-            <ErrorState message={uploadError} onRetry={retryUpload} />
-          </div>
-        )}
-
-        {translateError && (
-          <div style={{ marginBottom: '20px' }}>
-            <ErrorState message={translateError} onRetry={retryTranslate} />
-          </div>
-        )}
 
         {/* Drop zone */}
         <div
           onClick={() => document.getElementById('file-input').click()}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
+          onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave}
           style={{
-            height: '480px',
+            height: files.length === 0 ? '280px' : '140px',
             border: `2px ${isDragging ? 'solid' : 'dashed'} #0F62FE`,
-            borderRadius: '12px',
-            cursor: 'pointer',
-            backgroundColor: isDragging ? '#0F62FE' : '#FFFFFF',
+            borderRadius: '12px', cursor: 'pointer',
+            backgroundColor: isDragging ? '#EFF4FF' : '#FAFAFA',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: '12px', transition: 'background 200ms, border 200ms'
+            gap: '10px', transition: 'background 200ms, border 200ms, height 300ms'
           }}>
           <input
-            id="file-input" type="file" accept=".pdf"
+            id="file-input" type="file" accept=".pdf" multiple
             style={{ display: 'none' }}
-            onChange={e => handleFile(e.target.files[0])}
+            onChange={e => addFiles(e.target.files)}
           />
-
-          {file ? (
+          {isDragging ? (
             <>
-              <div key={checkmarkKey} className="check-anim" style={{ fontSize: '72px', lineHeight: 1 }}>✅</div>
-              <span style={{ fontWeight: '600', color: '#161616', fontSize: '16px' }}>{file.name}</span>
-              <span style={{ color: '#525252', fontSize: '14px' }}>{formatSize(file.size)}</span>
-            </>
-          ) : isDragging ? (
-            <>
-              <span style={{ fontSize: '72px' }}>📂</span>
-              <span style={{ color: '#FFFFFF', fontSize: '18px', fontWeight: '600' }}>Drop it here!</span>
+              <span style={{ fontSize: '48px' }}>&#x1F4C2;</span>
+              <span style={{ color: '#0F62FE', fontSize: '16px', fontWeight: '600' }}>Drop them here!</span>
             </>
           ) : (
             <>
-              <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#0F62FE" strokeWidth="1.5">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0F62FE" strokeWidth="1.5">
                 <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M8 12l4-4 4 4M12 8v8" />
               </svg>
-              <span style={{ color: '#525252', fontSize: '16px' }}>Drag your syllabus PDF here</span>
-              <span style={{ color: '#0F62FE', fontSize: '14px', textDecoration: 'underline' }}>or click to browse</span>
+              <span style={{ color: '#525252', fontSize: '15px' }}>
+                {files.length === 0 ? 'Drag your syllabus PDFs here' : 'Drag more PDFs to add'}
+              </span>
+              <span style={{ color: '#0F62FE', fontSize: '13px', textDecoration: 'underline' }}>or click to browse</span>
             </>
           )}
         </div>
 
         {typeError && (
-          <p style={{ color: '#DA1E28', fontSize: '14px', marginTop: '10px' }}>
-            Only PDF files are accepted. Please upload a .pdf file.
+          <p style={{ color: '#DA1E28', fontSize: '14px', marginTop: '10px' }}>Only PDF files are accepted.</p>
+        )}
+
+        {/* File queue */}
+        {files.length > 0 && (
+          <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#525252', marginBottom: '4px' }}>
+              {files.length} syllabus{files.length > 1 ? 'es' : ''} queued
+            </div>
+            {files.map((f, i) => (
+              <div
+                key={f.name + i}
+                className="file-row"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  backgroundColor: errors[i] ? '#FFF5F5' : processingIndex === i ? '#EFF4FF' : '#FFFFFF',
+                  border: `1px solid ${errors[i] ? '#DA1E28' : processingIndex === i ? '#0F62FE' : '#E0E0E0'}`,
+                  borderRadius: '8px', padding: '12px 14px',
+                  transition: 'all 200ms'
+                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                  <span style={{ fontSize: '22px', flexShrink: 0 }}>
+                    {errors[i] ? '❌' : processingIndex === i ? '⏳' : '📄'}
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: '600', color: '#161616', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {f.name}
+                    </div>
+                    <div style={{ fontSize: '12px', color: errors[i] ? '#DA1E28' : '#525252', marginTop: '2px' }}>
+                      {errors[i] || (processingIndex === i ? 'Processing with Granite…' : formatSize(f.size))}
+                    </div>
+                  </div>
+                </div>
+                {!isProcessing && (
+                  <button
+                    className="remove-btn"
+                    onClick={e => { e.stopPropagation(); removeFile(i) }}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      color: '#525252', fontSize: '18px', opacity: 0,
+                      transition: 'opacity 150ms', flexShrink: 0, padding: '4px 8px'
+                    }}
+                    title="Remove"
+                  >×</button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Analyse button */}
+        <button
+          className="analyse-btn"
+          onClick={handleAnalyseAll}
+          disabled={files.length === 0 || !capProfile || isProcessing}
+          style={{
+            width: '100%', height: '56px', marginTop: '24px',
+            backgroundColor: files.length > 0 && capProfile && !isProcessing ? '#0F62FE' : '#C6C6C6',
+            color: '#FFFFFF', border: 'none', borderRadius: '8px',
+            fontSize: '18px', fontWeight: '600',
+            cursor: files.length > 0 && capProfile && !isProcessing ? 'pointer' : 'not-allowed',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'transform 100ms'
+          }}>
+          {isProcessing
+            ? `✨ Analysing ${processingIndex !== null ? `(${processingIndex + 1}/${files.length})` : ''}…`
+            : `✨ Analyse with Vantage${files.length > 1 ? ` (${files.length} courses)` : ''}`}
+        </button>
+
+        {hasErrors && !isProcessing && (
+          <p style={{ color: '#DA1E28', fontSize: '13px', marginTop: '12px', textAlign: 'center' }}>
+            Some syllabi failed to process. Remove them or try again.
           </p>
         )}
 
-        <button
-          className="analyse-btn"
-          onClick={handleAnalyse}
-          disabled={!file}
-          style={{
-            width: '100%', height: '56px', marginTop: '20px',
-            backgroundColor: file ? '#0F62FE' : '#C6C6C6',
-            color: '#FFFFFF', border: 'none', borderRadius: '8px',
-            fontSize: '18px', fontWeight: '600',
-            cursor: file ? 'pointer' : 'not-allowed',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            transition: 'transform 100ms'
-          }}>
-          ✨ Analyse with Vantage
-        </button>
-
-        {/* IBM Footer */}
+        {/* Footer */}
         <div style={{ textAlign: 'center', color: '#525252', fontSize: '11px', padding: '12px', borderTop: '1px solid #E0E0E0', marginTop: '40px' }}>
           Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
         </div>
