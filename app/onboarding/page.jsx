@@ -90,6 +90,12 @@ export default function OnboardingPage() {
       if (!res.ok) throw new Error('API error ' + res.status)
       const data = await res.json()
       if (data.error) throw new Error(data.message || 'Failed to save profile')
+
+      // Persist disorders locally so ML model receives them regardless of DB column
+      const disorderAnswer = allAnswers.find(a => a.questionId === 'q6')
+      const disorders = Array.isArray(disorderAnswer?.answer) ? disorderAnswer.answer : []
+      localStorage.setItem('vantage_disorders', JSON.stringify(disorders))
+
       const name = allAnswers.find(a => a.questionId === 'q5')?.answer || 'there'
       await addVantageMessage(`Perfect! I have saved your profile, ${name}. Your Vantage experience is ready.`)
       setTimeout(() => router.push('/dashboard'), 1200)
