@@ -55,7 +55,14 @@ export default function DashboardPage() {
   useEffect(() => {
     const cap = localStorage.getItem('vantage_cap')
     if (!cap) { router.push('/onboarding'); return }
-    setCapProfile(JSON.parse(cap))
+    const parsed = JSON.parse(cap)
+    setCapProfile(parsed)
+
+    // Auto-redirect to Calm Mode if student has 2+ sensory sensitivities
+    if (parsed.sensoryFlags && parsed.sensoryFlags.length >= 2) {
+      router.push('/calm')
+      return
+    }
 
     const t = localStorage.getItem('vantage_tasks')
     if (t) setTasks(JSON.parse(t))
