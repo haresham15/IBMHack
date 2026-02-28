@@ -175,41 +175,6 @@ export default function DashboardPage() {
       <Navbar showNav={true} />
       <div style={{ paddingTop: '48px', fontFamily: 'var(--font)', minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
 
-        {/* Greeting bar */}
-        <div style={{
-          background: `linear-gradient(135deg, ${theme.accent}, color-mix(in srgb, ${theme.accent} 40%, #1B5E8A))`,
-          color: '#FFFFFF', padding: '28px 32px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-        }}>
-          <div>
-            <div style={{ fontSize: 'var(--fz-head)', fontWeight: 'bold', lineHeight: 'var(--lh)' }}>
-              Good {timeOfDay()}, {capProfile.displayName}.
-            </div>
-            <div style={{ fontSize: 'var(--fz-small)', opacity: 0.8, marginTop: '4px' }}>{formatDate()}</div>
-          </div>
-          <button onClick={handleSignOut} style={{
-            background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
-            color: '#FFFFFF', borderRadius: '6px', padding: '8px 16px',
-            cursor: 'pointer', fontSize: 'var(--fz-small)', fontWeight: '500',
-            minHeight: 'var(--min-tap)'
-          }}>Sign out</button>
-        </div>
-
-        {/* ML config badge */}
-        {theme.raw && (
-          <div style={{
-            backgroundColor: 'var(--bg-alt)', borderBottom: '1px solid var(--border)',
-            padding: '6px 24px', fontSize: '11px', color: 'var(--subtext)',
-            display: 'flex', gap: '16px', alignItems: 'center'
-          }}>
-            <span>🧠 AI-personalised UI</span>
-            <span>Theme: <b>{theme.raw.color_theme}</b></span>
-            <span>Font: <b>{theme.raw.font_family} {theme.raw.font_size}</b></span>
-            <span>Motion: <b>{theme.raw.motion}</b></span>
-            {theme.readAloud && <span>🔊 Read-aloud</span>}
-            {theme.noTimers && <span>⏱ No timers</span>}
-          </div>
-        )}
 
         {/* Agent Alert */}
 
@@ -322,8 +287,16 @@ export default function DashboardPage() {
           </>
         )}
 
-        <div style={{ textAlign: 'center', color: 'var(--subtext)', fontSize: '11px', padding: '12px', borderTop: '1px solid var(--border)', marginTop: '32px' }}>
-          Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border)', marginTop: '32px', padding: '12px 24px' }}>
+          <span style={{ color: 'var(--subtext)', fontSize: '11px' }}>Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2026</span>
+          <button onClick={handleSignOut} style={{
+            background: 'none', border: '1px solid var(--border)', color: 'var(--subtext)',
+            borderRadius: '6px', padding: '6px 14px', fontSize: '12px',
+            fontWeight: '500', cursor: 'pointer', transition: 'all 150ms'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)' }}
+          >Sign out</button>
         </div>
       </div>
     </>
