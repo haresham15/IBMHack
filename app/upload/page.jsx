@@ -194,9 +194,9 @@ export default function UploadPage() {
           onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave}
           style={{
             height: files.length === 0 ? '280px' : '140px',
-            border: `2px ${isDragging ? 'solid' : 'dashed'} #0F62FE`,
+            border: `2px ${isDragging ? 'solid' : 'dashed'} #4A90C4`,
             borderRadius: '12px', cursor: 'pointer',
-            backgroundColor: isDragging ? '#EFF4FF' : '#FAFAFA',
+            backgroundColor: isDragging ? '#EBF5FB' : '#FAFAFA',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             gap: '10px', transition: 'background 200ms, border 200ms, height 300ms'
           }}>
@@ -208,17 +208,17 @@ export default function UploadPage() {
           {isDragging ? (
             <>
               <span style={{ fontSize: '48px' }}>&#x1F4C2;</span>
-              <span style={{ color: '#0F62FE', fontSize: '16px', fontWeight: '600' }}>Drop them here!</span>
+              <span style={{ color: '#4A90C4', fontSize: '16px', fontWeight: '600' }}>Drop them here!</span>
             </>
           ) : (
             <>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0F62FE" strokeWidth="1.5">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4A90C4" strokeWidth="1.5">
                 <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M8 12l4-4 4 4M12 8v8" />
               </svg>
               <span style={{ color: '#525252', fontSize: '15px' }}>
                 {files.length === 0 ? 'Drag your syllabus PDFs here' : 'Drag more PDFs to add'}
               </span>
-              <span style={{ color: '#0F62FE', fontSize: '13px', textDecoration: 'underline' }}>or click to browse</span>
+              <span style={{ color: '#4A90C4', fontSize: '13px', textDecoration: 'underline' }}>or click to browse</span>
             </>
           )}
         </div>
@@ -239,8 +239,8 @@ export default function UploadPage() {
                 className="file-row"
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  backgroundColor: errors[i] ? '#FFF5F5' : processingIndex === i ? '#EFF4FF' : '#FFFFFF',
-                  border: `1px solid ${errors[i] ? '#DA1E28' : processingIndex === i ? '#0F62FE' : '#E0E0E0'}`,
+                  backgroundColor: errors[i] ? '#FFF5F5' : processingIndex === i ? '#EBF5FB' : '#FFFFFF',
+                  border: `1px solid ${errors[i] ? '#DA1E28' : processingIndex === i ? '#4A90C4' : '#E0E0E0'}`,
                   borderRadius: '8px', padding: '12px 14px',
                   transition: 'all 200ms'
                 }}>
@@ -281,7 +281,7 @@ export default function UploadPage() {
           disabled={files.length === 0 || !capProfile || isProcessing}
           style={{
             width: '100%', height: '56px', marginTop: '24px',
-            backgroundColor: files.length > 0 && capProfile && !isProcessing ? '#0F62FE' : '#C6C6C6',
+            backgroundColor: files.length > 0 && capProfile && !isProcessing ? '#4A90C4' : '#C6C6C6',
             color: '#FFFFFF', border: 'none', borderRadius: '8px',
             fontSize: '18px', fontWeight: '600',
             cursor: files.length > 0 && capProfile && !isProcessing ? 'pointer' : 'not-allowed',

@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0F62FE 0%, #001D6C 60%, #000B2E 100%)',
+      background: 'linear-gradient(135deg, #DAEEFB 0%, #A8D8EA 40%, #5BAACF 100%)',
       fontFamily: 'IBM Plex Sans, sans-serif',
       display: 'flex',
       flexDirection: 'column',
@@ -24,12 +24,12 @@ export default function Home() {
       <div style={{
         position: 'absolute', top: '-120px', right: '-120px',
         width: '480px', height: '480px', borderRadius: '50%',
-        background: 'rgba(255,255,255,0.04)', pointerEvents: 'none'
+        background: 'rgba(255,255,255,0.18)', pointerEvents: 'none'
       }} />
       <div style={{
         position: 'absolute', bottom: '-80px', left: '-80px',
         width: '320px', height: '320px', borderRadius: '50%',
-        background: 'rgba(255,255,255,0.03)', pointerEvents: 'none'
+        background: 'rgba(255,255,255,0.12)', pointerEvents: 'none'
       }} />
 
       {/* Nav bar */}
@@ -37,10 +37,10 @@ export default function Home() {
         padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <span style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '22px', letterSpacing: '-0.5px' }}>Vantage</span>
-          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>AI for Every Brain</span>
+          <span style={{ color: '#1A3A52', fontWeight: 'bold', fontSize: '22px', letterSpacing: '-0.5px' }}>Vantage</span>
+          <span style={{ color: 'rgba(26,58,82,0.55)', fontSize: '13px' }}>AI for Every Brain</span>
         </div>
-        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>IBM SkillsBuild Hackathon 2026</div>
+        <div style={{ fontSize: '12px', color: 'rgba(26,58,82,0.45)' }}>IBM SkillsBuild Hackathon 2026</div>
       </header>
 
       {/* Main content */}
@@ -51,20 +51,21 @@ export default function Home() {
         {/* Left: hero copy */}
         <div style={{ maxWidth: '480px', flex: '1 1 320px' }}>
           <div style={{
-            display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.1)',
+            display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.35)',
             borderRadius: '20px', padding: '4px 14px', fontSize: '12px',
-            color: 'rgba(255,255,255,0.8)', marginBottom: '20px', letterSpacing: '0.5px'
+            color: '#1A3A52', marginBottom: '20px', letterSpacing: '0.5px',
+            border: '1px solid rgba(255,255,255,0.5)'
           }}>
             Powered by IBM Granite &amp; WatsonX
           </div>
           <h1 style={{
-            fontSize: '56px', fontWeight: '800', color: '#FFFFFF',
+            fontSize: '56px', fontWeight: '800', color: '#1A3A52',
             lineHeight: 1.1, marginBottom: '20px', letterSpacing: '-1px'
           }}>
             Your campus.<br />
-            <span style={{ color: '#93C5FD' }}>Your pace.</span>
+            <span style={{ color: '#2471A3' }}>Your pace.</span>
           </h1>
-          <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: '36px' }}>
+          <p style={{ fontSize: '18px', color: 'rgba(26,58,82,0.75)', lineHeight: 1.6, marginBottom: '36px' }}>
             Vantage reads your syllabus and turns it into a personalised task list — built around how <em>your</em> brain works.
           </p>
 
@@ -78,10 +79,10 @@ export default function Home() {
             ].map(({ icon, label }) => (
               <div key={label} style={{
                 display: 'flex', alignItems: 'center', gap: '6px',
-                backgroundColor: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                backgroundColor: 'rgba(255,255,255,0.35)',
+                border: '1px solid rgba(255,255,255,0.5)',
                 borderRadius: '8px', padding: '6px 14px',
-                fontSize: '13px', color: 'rgba(255,255,255,0.85)'
+                fontSize: '13px', color: '#1A3A52'
               }}>
                 <span>{icon}</span><span>{label}</span>
               </div>
@@ -94,13 +95,13 @@ export default function Home() {
           backgroundColor: '#FFFFFF',
           borderRadius: '20px',
           padding: '40px 36px',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
+          boxShadow: '0 24px 64px rgba(26,58,82,0.2)',
           width: '100%', maxWidth: '380px', flex: '0 0 auto'
         }}>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: '#0F62FE', letterSpacing: '1px', marginBottom: '12px', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#4A90C4', letterSpacing: '1px', marginBottom: '12px', textTransform: 'uppercase' }}>
             Get Started Free
           </div>
-          <h2 style={{ fontSize: '26px', fontWeight: '800', color: '#161616', marginBottom: '8px', lineHeight: 1.2 }}>
+          <h2 style={{ fontSize: '26px', fontWeight: '800', color: '#1A3A52', marginBottom: '8px', lineHeight: 1.2 }}>
             Welcome to Vantage
           </h2>
           <p style={{ fontSize: '14px', color: '#525252', marginBottom: '28px', lineHeight: 1.5 }}>
@@ -114,12 +115,12 @@ export default function Home() {
               gap: '12px', padding: '14px 20px',
               border: '1.5px solid #E0E0E0', borderRadius: '10px',
               backgroundColor: '#FFFFFF', fontSize: '15px', fontWeight: '600',
-              color: '#161616', cursor: 'pointer',
+              color: '#1A3A52', cursor: 'pointer',
               transition: 'all 150ms', marginBottom: '16px'
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#0F62FE'
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(15,98,254,0.15)'
+              e.currentTarget.style.borderColor = '#4A90C4'
+              e.currentTarget.style.boxShadow = '0 4px 16px rgba(74,144,196,0.2)'
               e.currentTarget.style.transform = 'translateY(-1px)'
             }}
             onMouseLeave={e => {
@@ -144,7 +145,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer style={{ padding: '16px 40px', textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
+      <footer style={{ padding: '16px 40px', textAlign: 'center', fontSize: '11px', color: 'rgba(26,58,82,0.4)' }}>
         Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2026
       </footer>
     </div>

@@ -179,7 +179,7 @@ export default function DashboardPage() {
 
         {/* Greeting bar */}
         <div style={{
-          background: `linear-gradient(135deg, ${theme.accent}, color-mix(in srgb, ${theme.accent} 40%, #001D6C))`,
+          background: `linear-gradient(135deg, ${theme.accent}, color-mix(in srgb, ${theme.accent} 40%, #1B5E8A))`,
           color: '#FFFFFF', padding: '28px 32px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>

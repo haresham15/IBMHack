@@ -6,7 +6,7 @@ export default function Navbar({ showNav = true }) {
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, height: '48px',
-      backgroundColor: 'var(--accent, #0F62FE)', display: 'flex', alignItems: 'center',
+      backgroundColor: 'var(--accent, #4A90C4)', display: 'flex', alignItems: 'center',
       justifyContent: 'space-between', padding: '0 24px', zIndex: 100,
       transition: 'background-color 400ms ease'
     }}>

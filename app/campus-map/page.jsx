@@ -9,7 +9,7 @@ const CampusMap = dynamic(() => import('@/components/CampusMap'), {
   loading: () => (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      width: '100%', height: '100%', background: 'linear-gradient(135deg,#EFF4FF,#F4F4F4)',
+      width: '100%', height: '100%', background: 'linear-gradient(135deg,#EBF5FB,#F4F4F4)',
       fontFamily: 'IBM Plex Sans,sans-serif', gap: '12px'
     }}>
       <div style={{ fontSize: '32px' }}>🗺️</div>
@@ -108,11 +108,11 @@ const LOCATIONS = [
 const ALL_PLACES = LOCATIONS.flatMap(cat => cat.places.map(p => ({ ...p, category: cat.category, icon: cat.icon })))
 
 const TAG_COLORS = {
-  'CSE Hub': '#0F62FE', 'Engineering': '#001D6C', 'Sciences': '#198038', 'Architecture': '#8A3FFC',
+  'CSE Hub': '#4A90C4', 'Engineering': '#1B5E8A', 'Sciences': '#198038', 'Architecture': '#8A3FFC',
   'Humanities': '#B28600', 'Business': '#005D5D', 'Classroom': '#6F6F6F', 'Education': '#9F1853',
-  'Open 24h': '#DA1E28', 'STEM': '#0F62FE', 'Health': '#9F1853', 'Group Study': '#393939',
-  'Student Hub': '#0F62FE', 'Outdoors': '#198038', 'Athletics': '#BB1133', 'Recreation': '#005D5D',
-  'Medical': '#DA1E28', 'Student Care': '#9F1853', 'Wellness': '#8A3FFC', 'Accessibility': '#0F62FE',
+  'Open 24h': '#DA1E28', 'STEM': '#4A90C4', 'Health': '#9F1853', 'Group Study': '#393939',
+  'Student Hub': '#4A90C4', 'Outdoors': '#198038', 'Athletics': '#BB1133', 'Recreation': '#005D5D',
+  'Medical': '#DA1E28', 'Student Care': '#9F1853', 'Wellness': '#8A3FFC', 'Accessibility': '#4A90C4',
   'Free Ride': '#198038', 'Parking': '#525252', 'Public Transit': '#393939', 'Dorm': '#006161', 'Dining': '#8A3FFC',
 }
 

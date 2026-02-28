@@ -150,7 +150,7 @@ export default function OnboardingPage() {
         }
       `}</style>
       <div style={{
-        minHeight: '100vh', background: 'linear-gradient(180deg, #0F62FE 0%, #ffffff 40%)',
+        minHeight: '100vh', background: 'linear-gradient(180deg, #4A90C4 0%, #ffffff 40%)',
         fontFamily: 'IBM Plex Sans, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center',
         position: 'relative'
       }}>
@@ -175,7 +175,7 @@ export default function OnboardingPage() {
               animation: 'fadeIn 300ms ease'
             }}>
               <div style={{
-                backgroundColor: m.role === 'user' ? '#0F62FE' : '#F4F4F4',
+                backgroundColor: m.role === 'user' ? '#4A90C4' : '#F4F4F4',
                 color: m.role === 'user' ? '#FFFFFF' : '#161616',
                 borderRadius: m.role === 'user' ? '12px 12px 0 12px' : '12px 12px 12px 0',
                 padding: '16px', maxWidth: '75%', fontSize: '15px', lineHeight: 1.5
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
             }}>
               {[0, 1, 2].map(i => (
                 <div key={i} style={{
-                  width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#0F62FE',
+                  width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4A90C4',
                   animation: `dot-pulse 1.2s ease-in-out ${i * 0.2}s infinite`
                 }} />
               ))}
@@ -220,13 +220,13 @@ export default function OnboardingPage() {
                 {currentQ.options.map((opt, i) => (
                   <button key={i} onClick={() => handleAnswer(currentQ.values[i], opt)}
                     style={{
-                      border: '2px solid #0F62FE', color: '#0F62FE',
+                      border: '2px solid #4A90C4', color: '#4A90C4',
                       background: '#FFFFFF', borderRadius: '20px',
                       padding: '8px 16px', cursor: 'pointer', fontSize: '14px',
                       transition: 'background 150ms, color 150ms'
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0F62FE'; e.currentTarget.style.color = '#FFFFFF' }}
-                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#FFFFFF'; e.currentTarget.style.color = '#0F62FE' }}>
+                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#4A90C4'; e.currentTarget.style.color = '#FFFFFF' }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#FFFFFF'; e.currentTarget.style.color = '#4A90C4' }}>
                     {opt}
                   </button>
                 ))}
@@ -243,9 +243,9 @@ export default function OnboardingPage() {
                       <button key={i} onClick={() => setMultiSelected(s =>
                         s.includes(val) ? s.filter(v => v !== val) : [...s, val]
                       )} style={{
-                        border: '2px solid #0F62FE',
-                        backgroundColor: selected ? '#0F62FE' : '#FFFFFF',
-                        color: selected ? '#FFFFFF' : '#0F62FE',
+                        border: '2px solid #4A90C4',
+                        backgroundColor: selected ? '#4A90C4' : '#FFFFFF',
+                        color: selected ? '#FFFFFF' : '#4A90C4',
                         borderRadius: '20px', padding: '8px 16px',
                         cursor: 'pointer', fontSize: '14px'
                       }}>{opt}</button>
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
                 </div>
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <button onClick={handleMultiContinue} style={{
-                    backgroundColor: '#0F62FE', color: '#FFFFFF',
+                    backgroundColor: '#4A90C4', color: '#FFFFFF',
                     border: 'none', borderRadius: '20px', padding: '10px 24px',
                     cursor: 'pointer', fontSize: '14px', fontWeight: '600'
                   }}>Continue &#x2192;</button>
@@ -277,12 +277,12 @@ export default function OnboardingPage() {
                   onKeyDown={e => e.key === 'Enter' && textInput.trim() && handleAnswer(textInput.trim(), textInput.trim())}
                   placeholder="Your name..."
                   style={{
-                    flex: 1, border: '2px solid #0F62FE', borderRadius: '8px',
+                    flex: 1, border: '2px solid #4A90C4', borderRadius: '8px',
                     padding: '10px 14px', fontSize: '15px', outline: 'none'
                   }} />
                 <button onClick={() => textInput.trim() && handleAnswer(textInput.trim(), textInput.trim())}
                   style={{
-                    backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
+                    backgroundColor: '#4A90C4', color: '#FFFFFF', border: 'none',
                     borderRadius: '8px', padding: '10px 20px', cursor: 'pointer', fontSize: '14px'
                   }}>Continue &#x2192;</button>
               </div>

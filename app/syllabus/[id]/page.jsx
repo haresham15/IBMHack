@@ -106,7 +106,7 @@ export default function SyllabusPage() {
             <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#161616', marginBottom: '8px' }}>No tasks found</h2>
             <p style={{ color: '#525252', fontSize: '14px', marginBottom: '24px' }}>Upload a syllabus to generate your personalised task list.</p>
             <a href="/upload" style={{
-              backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
+              backgroundColor: '#4A90C4', color: '#FFFFFF', border: 'none',
               borderRadius: '8px', padding: '12px 24px', fontSize: '15px',
               fontWeight: '600', textDecoration: 'none', display: 'inline-block'
             }}>Upload a Syllabus</a>
@@ -122,20 +122,20 @@ export default function SyllabusPage() {
       <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4' }}>
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #0F62FE, #001D6C)',
+          background: 'linear-gradient(135deg, #A8D8EA, #4A90C4)',
           padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
         }}>
           <div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFFFFF' }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1A3A52' }}>
               {syllabus?.courseName || 'Course Syllabus'}
             </div>
-            <div style={{ fontSize: '14px', color: '#93C5FD', marginTop: '4px' }}>
+            <div style={{ fontSize: '14px', color: '#2471A3', marginTop: '4px' }}>
               {syllabus?.instructor} {syllabus?.term ? `• ${syllabus.term}` : ''}
             </div>
           </div>
           <a href={`/api/syllabus/${id}/original`} target="_blank" rel="noreferrer"
             style={{
-              backgroundColor: '#FFFFFF', color: '#0F62FE',
+              backgroundColor: '#FFFFFF', color: '#4A90C4',
               border: 'none', borderRadius: '6px', padding: '8px 16px',
               fontSize: '14px', fontWeight: '600', textDecoration: 'none',
               display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
@@ -148,9 +148,9 @@ export default function SyllabusPage() {
         <div style={{ backgroundColor: '#FFFFFF', padding: '12px 32px', display: 'flex', gap: '8px', borderBottom: '1px solid #E0E0E0' }}>
           {FILTERS.map(f => (
             <button key={f} onClick={() => setActiveFilter(f)} style={{
-              border: '1px solid #0F62FE',
-              backgroundColor: activeFilter === f ? '#0F62FE' : '#FFFFFF',
-              color: activeFilter === f ? '#FFFFFF' : '#0F62FE',
+              border: '1px solid #4A90C4',
+              backgroundColor: activeFilter === f ? '#4A90C4' : '#FFFFFF',
+              color: activeFilter === f ? '#FFFFFF' : '#4A90C4',
               borderRadius: '20px', padding: '6px 16px', cursor: 'pointer', fontSize: '14px', fontWeight: '500'
             }}>{f}</button>
           ))}

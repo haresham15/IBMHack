@@ -29,7 +29,7 @@ export default function CampusMapPage() {
     const getNoiseColor = (level) => {
         switch (level.toLowerCase()) {
             case 'silent': return '#198038' // Green
-            case 'low': return '#0F62FE' // Blue
+            case 'low': return '#4A90C4' // Blue
             case 'moderate': return '#F1C21B' // Yellow
             case 'high': return '#FF832B' // Orange
             case 'overwhelming': return '#DA1E28' // Red
@@ -55,7 +55,7 @@ export default function CampusMapPage() {
                             Sensory Campus Map
                         </h1>
                         <p style={{ color: '#525252', fontSize: '15px', lineHeight: 1.6, maxWidth: '600px' }}>
-                            Real-time sensory tracking across campus. Based on public class schedules and student-contributed check-ins. <strong style={{ color: '#0F62FE' }}>Phase 2 will introduce live Wi-Fi density integration.</strong>
+                            Real-time sensory tracking across campus. Based on public class schedules and student-contributed check-ins. <strong style={{ color: '#4A90C4' }}>Phase 2 will introduce live Wi-Fi density integration.</strong>
                         </p>
                     </div>
 
@@ -137,7 +137,7 @@ export default function CampusMapPage() {
                                     onClick={() => toggleSafeSpace(loc.id)}
                                     style={{
                                         backgroundColor: loc.safeSpace ? '#FFFFFF' : '#F4F4F4',
-                                        color: loc.safeSpace ? '#DA1E28' : '#0F62FE',
+                                        color: loc.safeSpace ? '#DA1E28' : '#4A90C4',
                                         border: loc.safeSpace ? '1px solid #DA1E28' : '1px solid transparent',
                                         borderRadius: '4px', padding: '8px 16px', fontSize: '13px',
                                         fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap'
