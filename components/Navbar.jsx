@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 const LINKS = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -13,7 +14,14 @@ const LINKS = [
 
 export default function Navbar({ showNav = true }) {
   const path = usePathname()
+  const router = useRouter()
   const [hovered, setHovered] = useState(null)
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/')
+  }
 
   if (!showNav) return null
 
@@ -104,6 +112,22 @@ export default function Navbar({ showNav = true }) {
 
 
       </nav>
+
+      {/* Fixed sign-out button — visible on every page */}
+      <button
+        onClick={handleSignOut}
+        style={{
+          position: 'fixed', bottom: '20px', right: '20px', zIndex: 300,
+          background: '#FFFFFF', border: '1px solid #E0E0E0', color: '#525252',
+          borderRadius: '8px', padding: '8px 16px', fontSize: '12px',
+          fontWeight: '600', cursor: 'pointer', transition: 'all 150ms',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)', fontFamily: 'IBM Plex Sans, sans-serif'
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = '#4A90C4'; e.currentTarget.style.color = '#4A90C4' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = '#E0E0E0'; e.currentTarget.style.color = '#525252' }}
+      >
+        Sign out
+      </button>
     </>
   )
 }

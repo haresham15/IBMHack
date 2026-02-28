@@ -318,17 +318,6 @@ export default function DashboardPage() {
           Built with IBM Granite &amp; WatsonX
         </div>
 
-        {/* Fixed sign out button */}
-        <button onClick={handleSignOut} style={{
-          position: 'fixed', bottom: '20px', right: '20px', zIndex: 50,
-          background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--subtext)',
-          borderRadius: '8px', padding: '8px 16px', fontSize: '12px',
-          fontWeight: '500', cursor: 'pointer', transition: 'all 150ms',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-        }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)' }}
-        >Sign out</button>
       </div>
     </>
   )
