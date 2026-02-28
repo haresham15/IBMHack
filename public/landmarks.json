@@ -1,0 +1,168 @@
+[
+    {
+        "id": "thompson-steps",
+        "name": "Thompson Library — Main Steps",
+        "subtitle": "North entrance — look for the tall limestone columns",
+        "coordinates": [
+            -83.0122,
+            40.0078
+        ],
+        "emoji": "📚",
+        "sensoryNote": "🤫 One of the quietest spots on campus. 24-hour floors inside if you need to pause.",
+        "wayfinding": "Head south from these steps, keeping The Oval on your right.",
+        "vicinityTags": [
+            "Open 24h",
+            "STEM"
+        ]
+    },
+    {
+        "id": "orton-hall",
+        "name": "Orton Hall Clock Tower",
+        "subtitle": "South-east Oval — distinctive Romanesque sandstone tower",
+        "coordinates": [
+            -83.0100,
+            40.0063
+        ],
+        "emoji": "🕰️",
+        "sensoryNote": "🔔 Bells chime at the top of each hour. Step inside — the geology museum is cool and quiet.",
+        "wayfinding": "Walk straight south from this tower. Engineering buildings start at W 19th Ave.",
+        "vicinityTags": [
+            "Open 24h",
+            "Sciences",
+            "Humanities"
+        ]
+    },
+    {
+        "id": "oval-south-arch",
+        "name": "The Oval — South End",
+        "subtitle": "Open lawn — large lamppost arch marks the south exit",
+        "coordinates": [
+            -83.0099,
+            40.0052
+        ],
+        "emoji": "🌿",
+        "sensoryNote": "🌤️ Open space — can be active between classes. Quieter after 6 PM or early morning.",
+        "wayfinding": "Exit The Oval heading south-west. W 19th Ave is the next major crossing.",
+        "vicinityTags": [
+            "Outdoors",
+            "Engineering",
+            "Sciences"
+        ]
+    },
+    {
+        "id": "mirror-lake-bridge",
+        "name": "Mirror Lake Footbridge",
+        "subtitle": "Small arched bridge over the reflecting pool",
+        "coordinates": [
+            -83.0082,
+            40.0044
+        ],
+        "emoji": "🌊",
+        "sensoryNote": "💧 Very calming — water sounds help reduce sensory overload. Benches on both sides.",
+        "wayfinding": "Cross west over this bridge and continue along the path past Pomerene Hall.",
+        "vicinityTags": [
+            "Outdoors",
+            "Student Hub",
+            "Wellness"
+        ]
+    },
+    {
+        "id": "knowlton-plaza",
+        "name": "Knowlton Hall Courtyard",
+        "subtitle": "Neil Ave — open brick plaza in front of the Architecture school",
+        "coordinates": [
+            -83.0157,
+            40.0048
+        ],
+        "emoji": "🏗️",
+        "sensoryNote": "🎨 Usually calm. Large open courtyard — good for orientation before heading south.",
+        "wayfinding": "Turn south here on Neil Ave. Dreese Labs will be straight ahead in 3 minutes.",
+        "vicinityTags": [
+            "Architecture",
+            "Engineering"
+        ]
+    },
+    {
+        "id": "smith-lab-lawn",
+        "name": "Smith Lab / Physics Lawn",
+        "subtitle": "W 18th Ave — cluster of brick science buildings",
+        "coordinates": [
+            -83.0148,
+            40.0018
+        ],
+        "emoji": "⚗️",
+        "sensoryNote": "🔬 Calm between class periods. Watch for cyclists on the crosswalk at W 18th Ave.",
+        "wayfinding": "Dreese Labs is the next building north-west. Look for the brick overhang entrance.",
+        "vicinityTags": [
+            "Engineering",
+            "Sciences",
+            "CSE Hub"
+        ]
+    },
+    {
+        "id": "dreese-entrance",
+        "name": "Dreese Labs — Main Entrance",
+        "subtitle": "W 19th Ave at Neil Ave — brick overhang with CSE signage",
+        "coordinates": [
+            -83.0159,
+            40.0022
+        ],
+        "emoji": "🖥️",
+        "sensoryNote": "🏢 Ground floor can be busy during class changes. Third floor has quiet study pods and lower foot traffic.",
+        "wayfinding": "You have arrived! Elevators are on the right past the main doors.",
+        "vicinityTags": [
+            "CSE Hub",
+            "Engineering"
+        ]
+    },
+    {
+        "id": "ohio-union-steps",
+        "name": "Ohio Union — South Steps",
+        "subtitle": "High St at E 10th Ave — large brick building with glass atrium",
+        "coordinates": [
+            -83.0083,
+            40.0033
+        ],
+        "emoji": "🎓",
+        "sensoryNote": "🍕 Can be very loud at lunch. Quiet study alcoves on the 3rd floor near the east wing.",
+        "wayfinding": "Head west along High St, then south through the Arts corridor toward Smith Lab.",
+        "vicinityTags": [
+            "Student Hub",
+            "Outdoors"
+        ]
+    },
+    {
+        "id": "rpac-cannon-dr",
+        "name": "RPAC Main Entrance",
+        "subtitle": "Cannon Dr — large glass and brick recreation complex",
+        "coordinates": [
+            -83.0235,
+            40.0033
+        ],
+        "emoji": "🏊",
+        "sensoryNote": "🎵 Indoor can be loud with music. Outdoor pool area is quieter. Calm times: Mon–Fri before 10am.",
+        "wayfinding": "Continue south-west on Cannon Dr for parking or the Jesse Owens Stadium.",
+        "vicinityTags": [
+            "Recreation",
+            "Athletics",
+            "Free Ride"
+        ]
+    },
+    {
+        "id": "wexner-gate",
+        "name": "Wexner Center Grid Structure",
+        "subtitle": "15th Ave & High St — distinctive white metal lattice gateway",
+        "coordinates": [
+            -83.0061,
+            40.0043
+        ],
+        "emoji": "🔲",
+        "sensoryNote": "👓 Visually striking — the white grid is hard to miss. Quiet street-level plaza beneath.",
+        "wayfinding": "Turn west onto 15th Ave here to reach the humanities and arts buildings.",
+        "vicinityTags": [
+            "Humanities",
+            "Architecture",
+            "Student Hub"
+        ]
+    }
+]
