@@ -541,7 +541,7 @@ export default function CampusMapPage() {
 
           <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h2 style={{ margin: 0, fontSize: '22px', fontWeight: '700', color: '#161616' }}>OSU Campus Directory</h2>
+              <h2 style={{ margin: 0, fontSize: 'var(--fz-head, 22px)', fontWeight: '700', color: 'var(--text, #161616)' }}>OSU Campus Directory</h2>
               <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#525252' }}>
                 {ALL_PLACES.length} places ·{' '}
                 {pendingDest
@@ -563,10 +563,10 @@ export default function CampusMapPage() {
             }}>
               <span style={{ fontSize: '22px', flexShrink: 0 }}>🧠</span>
               <div>
-                <div style={{ fontWeight: '700', fontSize: '14px', color: '#161616', marginBottom: '4px' }}>
+                <div style={{ fontWeight: '700', fontSize: 'var(--fz-body, 14px)', color: 'var(--text, #161616)', marginBottom: '4px' }}>
                   AI-personalised campus view
                 </div>
-                <div style={{ fontSize: '13px', color: '#525252', lineHeight: 1.5 }}>
+                <div style={{ fontSize: 'var(--fz-small, 13px)', color: 'var(--subtext, #525252)', lineHeight: 'var(--lh, 1.5)' }}>
                   {noiseSensitive
                     ? 'Quiet spaces are sorted first based on your sensory profile. Focus Mode is ' + (autoFocusMode ? 'auto-enabled' : 'available') + ' on the map.'
                     : 'Landmark anchors on your route will be filtered to locations most relevant to your profile.'}
@@ -583,9 +583,9 @@ export default function CampusMapPage() {
               <input type="text" placeholder="Search buildings, tags, or descriptions…"
                 value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 style={{
-                  width: '100%', padding: '10px 14px 10px 40px', fontSize: '14px', fontFamily: 'IBM Plex Sans,sans-serif',
-                  border: '1.5px solid #C6C6C6', borderRadius: '8px', backgroundColor: '#FFFFFF',
-                  color: '#161616', outline: 'none', boxSizing: 'border-box', transition: 'border-color 150ms'
+                  width: '100%', padding: '10px 14px 10px 40px', fontSize: 'var(--fz-body, 14px)', fontFamily: 'var(--font)',
+                  border: '1px solid var(--border, #C6C6C6)', borderRadius: '8px', backgroundColor: 'var(--surface, #FFFFFF)',
+                  color: 'var(--text, #161616)', outline: 'none', boxSizing: 'border-box', transition: 'border-color 150ms'
                 }}
                 onFocus={e => e.target.style.borderColor = '#0070FF'}
                 onBlur={e => e.target.style.borderColor = '#C6C6C6'} />
@@ -593,11 +593,11 @@ export default function CampusMapPage() {
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {categories.map(cat => (
                 <button key={cat} onClick={() => setCategoryFilter(cat)} style={{
-                  padding: '7px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: '600',
-                  fontFamily: 'IBM Plex Sans,sans-serif', cursor: 'pointer', border: '1.5px solid',
-                  backgroundColor: categoryFilter === cat ? '#161616' : '#FFFFFF',
-                  color: categoryFilter === cat ? '#FFFFFF' : '#525252',
-                  borderColor: categoryFilter === cat ? '#161616' : '#C6C6C6', transition: 'all 150ms ease'
+                  padding: '7px 14px', borderRadius: '20px', fontSize: 'var(--fz-small, 12px)', fontWeight: '600',
+                  fontFamily: 'var(--font)', cursor: 'pointer', border: '1px solid',
+                  backgroundColor: categoryFilter === cat ? 'var(--text, #161616)' : 'var(--surface, #FFFFFF)',
+                  color: categoryFilter === cat ? 'var(--surface, #FFFFFF)' : 'var(--subtext, #525252)',
+                  borderColor: categoryFilter === cat ? 'var(--text, #161616)' : 'var(--border, #C6C6C6)', transition: 'all 150ms ease'
                 }}>
                   {LOCATIONS.find(l => l.category === cat)?.icon ?? '🗂️'} {cat}
                 </button>
