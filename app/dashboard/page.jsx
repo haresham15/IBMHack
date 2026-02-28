@@ -187,7 +187,7 @@ export default function DashboardPage() {
       `}</style>
 
       <Navbar showNav={true} />
-      <div style={{ paddingTop: '48px', fontFamily: 'var(--font)', minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
+      <div style={{ paddingTop: '48px', paddingBottom: '40px', fontFamily: 'var(--font)', minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
 
 
         {/* Agent Alert */}
@@ -290,7 +290,7 @@ export default function DashboardPage() {
                 {/* Time horizon label */}
                 <div style={{ fontSize: 'var(--fz-small)', color: 'var(--subtext)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px', lineHeight: 'var(--lh)' }}>
                   <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#198038' }} />
-                  Upcoming within your {capProfile.timeHorizon} time horizon
+                  Showing tasks due in the next {{ '24h': '24 hours', '72h': '3 days', '1week': 'week', '2weeks': '2 weeks' }[capProfile.timeHorizon] ?? capProfile.timeHorizon}
                 </div>
 
                 {/* Task grid */}
@@ -314,8 +314,8 @@ export default function DashboardPage() {
           </>
         )}
 
-        <div style={{ textAlign: 'center', color: 'var(--subtext)', fontSize: '11px', padding: '12px', borderTop: '1px solid var(--border)', marginTop: '32px' }}>
-          Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2026
+        <div style={{ textAlign: 'center', color: 'var(--subtext)', fontSize: '11px', padding: '12px', borderTop: '1px solid var(--border)', marginTop: 'auto', position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: 'var(--bg)', zIndex: 10 }}>
+          Built with IBM Granite &amp; WatsonX
         </div>
 
         {/* Fixed sign out button */}
