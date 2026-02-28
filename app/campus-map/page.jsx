@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
+import { useStoredUIConfig } from '@/lib/useUIConfig'
 
 const CampusMap = dynamic(() => import('@/components/CampusMap'), {
   ssr: false,
@@ -146,6 +147,7 @@ function maneuverEmoji(type, modifier) {
 
 // ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 export default function CampusMapPage() {
+  useStoredUIConfig()
   const [pendingDest, setPendingDest] = useState(null)   // picked but not started
   const [selectedDestination, setSelectedDestination] = useState(null)  // route active
   const [searchQuery, setSearchQuery] = useState('')
