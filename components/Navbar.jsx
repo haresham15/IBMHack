@@ -10,10 +10,10 @@ export default function Navbar({ showNav = true }) {
       justifyContent: 'space-between', padding: '0 24px', zIndex: 100,
       transition: 'background-color 400ms ease'
     }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-        <span aria-label="Vantage Home" style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '20px' }}>Vantage</span>
+      <Link href="/" style={{ display: 'flex', alignItems: 'baseline', gap: '8px', textDecoration: 'none' }}>
+        <span style={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: '20px' }}>Vantage</span>
         <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px' }}>AI for Every Brain</span>
-      </div>
+      </Link>
       <div style={{ display: 'flex', gap: '24px' }}>
         <Link href="/dashboard" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none' }}
           onMouseEnter={e => e.target.style.textDecoration = 'underline'}
