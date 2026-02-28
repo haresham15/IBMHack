@@ -14,10 +14,12 @@ export default function CampusMap() {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
 
-  useEffect(() => {
-    if (mapRef.current || !containerRef.current) return
+  const token = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN
 
-    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN
+  useEffect(() => {
+    if (mapRef.current || !containerRef.current || !token) return
+
+    mapboxgl.accessToken = token
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
@@ -78,6 +80,29 @@ export default function CampusMap() {
       mapRef.current = null
     }
   }, [])
+
+  if (!token) {
+    return (
+      <div style={{
+        width: '100%', height: '100%', display: 'flex',
+        flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0F62FE11, #F4F4F4)',
+        fontFamily: 'IBM Plex Sans, sans-serif', gap: '12px', padding: '24px', textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '48px' }}>🗺️</div>
+        <h2 style={{ margin: 0, fontSize: '20px', color: '#161616' }}>3D Campus Map</h2>
+        <p style={{ margin: 0, color: '#525252', fontSize: '14px', maxWidth: '400px' }}>
+          The interactive 3D campus map requires a Mapbox API token.
+          Set <code>NEXT_PUBLIC_MAPBOX_API_TOKEN</code> in your <code>.env.local</code> file to enable this feature.
+        </p>
+        <a href="/map" style={{
+          marginTop: '12px', backgroundColor: '#0F62FE', color: '#FFFFFF',
+          padding: '10px 24px', borderRadius: '8px', textDecoration: 'none',
+          fontSize: '14px', fontWeight: '600'
+        }}>View Sensory Map Instead →</a>
+      </div>
+    )
+  }
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }} />

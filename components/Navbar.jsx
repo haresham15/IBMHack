@@ -14,25 +14,25 @@ export default function Navbar({ showNav = true }) {
         <span style={{ color: '#93C5FD', fontSize: '13px' }}>AI for Every Brain</span>
       </div>
       <div style={{ display: 'flex', gap: '24px' }}>
-        <Link href="/map" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none' }}
-          onMouseEnter={e => e.target.style.textDecoration = 'underline'}
-          onMouseLeave={e => e.target.style.textDecoration = 'none'}>
-          Campus Map
-        </Link>
         <Link href="/dashboard" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none' }}
-          onMouseEnter={e => e.target.style.textDecoration = 'underline'}
-          onMouseLeave={e => e.target.style.textDecoration = 'none'}>
+          onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
           Dashboard
         </Link>
         <Link href="/upload" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none' }}
-          onMouseEnter={e => e.target.style.textDecoration = 'underline'}
-          onMouseLeave={e => e.target.style.textDecoration = 'none'}>
+          onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
           Upload
+        </Link>
+        <Link href="/map" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+          onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+          onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
+          🗺️ Sensory Map
         </Link>
         <Link href="/campus-map" style={{ color: '#FFFFFF', fontSize: '14px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
           onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
           onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
-          🗺️ Campus Map
+          🏫 3D Campus
         </Link>
       </div>
     </nav>
