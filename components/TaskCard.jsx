@@ -113,8 +113,8 @@ export default function TaskCard({ task, onComplete }) {
           style={{
             position: 'absolute', top: '16px', right: '16px',
             width: '42px', height: '42px', borderRadius: '8px',
-            border: `2px solid ${task.completed ? 'var(--accent, #0F62FE)' : 'var(--border, #C6C6C6)'}`,
-            backgroundColor: task.completed ? 'var(--accent, #0F62FE)' : 'transparent',
+            border: `2px solid ${task.completed ? 'var(--accent, #4A90C4)' : 'var(--border, #C6C6C6)'}`,
+            backgroundColor: task.completed ? 'var(--accent, #4A90C4)' : 'transparent',
             cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: noMotion ? 'none' : 'all 200ms ease',
             color: task.completed ? '#fff' : 'transparent',
@@ -130,7 +130,7 @@ export default function TaskCard({ task, onComplete }) {
           style={{
             position: 'absolute', top: '16px', right: '16px',
             width: '20px', height: '20px',
-            cursor: 'pointer', accentColor: 'var(--accent, #0F62FE)'
+            cursor: 'pointer', accentColor: 'var(--accent, #4A90C4)'
           }}
         />
       )}
@@ -151,9 +151,9 @@ export default function TaskCard({ task, onComplete }) {
         {!isMinimal && task.syllabusId && (
           <a href={`/syllabus/${task.syllabusId}`} style={{
             fontSize: 'var(--fz-small, 11px)',
-            color: 'var(--accent, #0F62FE)',
+            color: 'var(--accent, #4A90C4)',
             textDecoration: 'none',
-            backgroundColor: 'color-mix(in srgb, var(--accent, #0F62FE) 10%, transparent)',
+            backgroundColor: 'color-mix(in srgb, var(--accent, #4A90C4) 10%, transparent)',
             padding: '2px 6px', borderRadius: '4px'
           }}>↗ View Source</a>
         )}
@@ -180,7 +180,7 @@ export default function TaskCard({ task, onComplete }) {
         <div style={{ marginBottom: '10px' }}>
           <button onClick={() => setStepsOpen(o => !o)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: 'var(--accent, #0F62FE)',
+            color: 'var(--accent, #4A90C4)',
             fontSize: 'var(--fz-small, 13px)', padding: 0
           }}>
             {stepsOpen ? '▾ Hide steps' : '▸ Show steps'}
@@ -226,7 +226,7 @@ export default function TaskCard({ task, onComplete }) {
               border: `1px solid var(--border, #C6C6C6)`,
               borderRadius: '6px', padding: '3px 8px',
               cursor: 'pointer', fontSize: '14px',
-              color: speaking ? 'var(--accent, #0F62FE)' : 'var(--subtext, #525252)',
+              color: speaking ? 'var(--accent, #4A90C4)' : 'var(--subtext, #525252)',
               transition: 'color 150ms'
             }}>
             {speaking ? '🔊' : '🔈'}

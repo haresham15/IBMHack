@@ -6,69 +6,127 @@ export default function Home() {
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`
-      }
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
     })
   }
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #0F62FE 0%, #001D6C 100%)',
+      background: 'linear-gradient(135deg, #DAEEFB 0%, #A8D8EA 40%, #5BAACF 100%)',
       fontFamily: 'IBM Plex Sans, sans-serif',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px'
+      overflow: 'hidden',
+      position: 'relative'
     }}>
-      <div style={{ textAlign: 'center', maxWidth: '480px', width: '100%' }}>
-        <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#FFFFFF', marginBottom: '12px' }}>
-          Vantage
+      {/* Decorative blobs */}
+      <div style={{
+        position: 'absolute', top: '-120px', right: '-120px',
+        width: '480px', height: '480px', borderRadius: '50%',
+        background: 'rgba(255,255,255,0.18)', pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '-80px', left: '-80px',
+        width: '320px', height: '320px', borderRadius: '50%',
+        background: 'rgba(255,255,255,0.12)', pointerEvents: 'none'
+      }} />
+
+      {/* Nav bar */}
+      <header style={{
+        padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <span style={{ color: '#1A3A52', fontWeight: 'bold', fontSize: '22px', letterSpacing: '-0.5px' }}>Vantage</span>
+          <span style={{ color: 'rgba(26,58,82,0.55)', fontSize: '13px' }}>AI for Every Brain</span>
         </div>
-        <div style={{ fontSize: '18px', color: '#93C5FD', marginBottom: '48px', lineHeight: 1.5 }}>
-          AI-powered academic support designed for every campus brain.
+        <div style={{ fontSize: '12px', color: 'rgba(26,58,82,0.45)' }}>IBM SkillsBuild Hackathon 2026</div>
+      </header>
+
+      {/* Main content */}
+      <main style={{
+        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '40px 24px', gap: '80px', flexWrap: 'wrap'
+      }}>
+        {/* Left: hero copy */}
+        <div style={{ maxWidth: '480px', flex: '1 1 320px' }}>
+          <div style={{
+            display: 'inline-block', backgroundColor: 'rgba(255,255,255,0.35)',
+            borderRadius: '20px', padding: '4px 14px', fontSize: '12px',
+            color: '#1A3A52', marginBottom: '20px', letterSpacing: '0.5px',
+            border: '1px solid rgba(255,255,255,0.5)'
+          }}>
+            Powered by IBM Granite &amp; WatsonX
+          </div>
+          <h1 style={{
+            fontSize: '56px', fontWeight: '800', color: '#1A3A52',
+            lineHeight: 1.1, marginBottom: '20px', letterSpacing: '-1px'
+          }}>
+            Your campus.<br />
+            <span style={{ color: '#2471A3' }}>Your pace.</span>
+          </h1>
+          <p style={{ fontSize: '18px', color: 'rgba(26,58,82,0.75)', lineHeight: 1.6, marginBottom: '36px' }}>
+            Vantage reads your syllabus and turns it into a personalised task list — built around how <em>your</em> brain works.
+          </p>
+
+          {/* Feature pills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            {[
+              { icon: '📄', label: 'Syllabus → Tasks' },
+              { icon: '🧠', label: 'Neurodivergent-first' },
+              { icon: '🗺️', label: 'Campus Map' },
+              { icon: '🎯', label: 'Priority Engine' },
+            ].map(({ icon, label }) => (
+              <div key={label} style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                backgroundColor: 'rgba(255,255,255,0.35)',
+                border: '1px solid rgba(255,255,255,0.5)',
+                borderRadius: '8px', padding: '6px 14px',
+                fontSize: '13px', color: '#1A3A52'
+              }}>
+                <span>{icon}</span><span>{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
+        {/* Right: sign-in card */}
         <div style={{
           backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '40px 32px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          borderRadius: '20px',
+          padding: '40px 36px',
+          boxShadow: '0 24px 64px rgba(26,58,82,0.2)',
+          width: '100%', maxWidth: '380px', flex: '0 0 auto'
         }}>
-          <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#161616', marginBottom: '8px' }}>
-            Get Started
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#4A90C4', letterSpacing: '1px', marginBottom: '12px', textTransform: 'uppercase' }}>
+            Get Started Free
           </div>
-          <div style={{ fontSize: '14px', color: '#525252', marginBottom: '28px' }}>
-            Sign in to save your profile and access your personalized task list from any device.
-          </div>
+          <h2 style={{ fontSize: '26px', fontWeight: '800', color: '#1A3A52', marginBottom: '8px', lineHeight: 1.2 }}>
+            Welcome to Vantage
+          </h2>
+          <p style={{ fontSize: '14px', color: '#525252', marginBottom: '28px', lineHeight: 1.5 }}>
+            Sign in to access your personalised academic dashboard.
+          </p>
 
           <button
             onClick={signInWithGoogle}
             style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px',
-              padding: '14px 24px',
-              border: '2px solid #E0E0E0',
-              borderRadius: '8px',
-              backgroundColor: '#FFFFFF',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#161616',
-              cursor: 'pointer',
-              transition: 'border-color 150ms, box-shadow 150ms'
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: '12px', padding: '14px 20px',
+              border: '1.5px solid #E0E0E0', borderRadius: '10px',
+              backgroundColor: '#FFFFFF', fontSize: '15px', fontWeight: '600',
+              color: '#1A3A52', cursor: 'pointer',
+              transition: 'all 150ms', marginBottom: '16px'
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#0F62FE'
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(15,98,254,0.15)'
+              e.currentTarget.style.borderColor = '#4A90C4'
+              e.currentTarget.style.boxShadow = '0 4px 16px rgba(74,144,196,0.2)'
+              e.currentTarget.style.transform = 'translateY(-1px)'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = '#E0E0E0'
               e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'none'
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
@@ -79,12 +137,17 @@ export default function Home() {
             </svg>
             Continue with Google
           </button>
-        </div>
 
-        <div style={{ marginTop: '24px', fontSize: '12px', color: '#93C5FD' }}>
-          Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2025
+          <p style={{ fontSize: '11px', color: '#A8A8A8', textAlign: 'center', lineHeight: 1.5 }}>
+            By continuing, you agree to use this app responsibly.<br />No spam. No data selling.
+          </p>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer style={{ padding: '16px 40px', textAlign: 'center', fontSize: '11px', color: 'rgba(26,58,82,0.4)' }}>
+        Powered by IBM Granite &amp; WatsonX • IBM SkillsBuild Hackathon 2026
+      </footer>
     </div>
   )
 }

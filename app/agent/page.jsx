@@ -76,9 +76,9 @@ export default function AgentPage() {
   }
 
   const chipStyle = (active) => ({
-    border: `2px solid #0F62FE`,
-    color: active ? '#FFFFFF' : '#0F62FE',
-    backgroundColor: active ? '#0F62FE' : '#FFFFFF',
+    border: `2px solid #4A90C4`,
+    color: active ? '#FFFFFF' : '#4A90C4',
+    backgroundColor: active ? '#4A90C4' : '#FFFFFF',
     borderRadius: '20px', padding: '8px 24px',
     cursor: 'pointer', fontSize: '14px', fontWeight: '500'
   })
@@ -105,7 +105,7 @@ export default function AgentPage() {
               {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
                 <div key={i} style={{
                   flex: 1, height: '6px', borderRadius: '3px',
-                  backgroundColor: i < step ? '#0F62FE' : '#E0E0E0',
+                  backgroundColor: i < step ? '#4A90C4' : '#E0E0E0',
                   transition: 'background 300ms'
                 }} />
               ))}
@@ -131,7 +131,7 @@ export default function AgentPage() {
                   I&apos;ll ask for them one at a time. Take your time — there&apos;s no rush.
                 </div>
                 <button onClick={() => setStep(1)} style={{
-                  alignSelf: 'flex-start', backgroundColor: '#0F62FE', color: '#FFFFFF',
+                  alignSelf: 'flex-start', backgroundColor: '#4A90C4', color: '#FFFFFF',
                   border: 'none', borderRadius: '8px', padding: '10px 24px',
                   fontSize: '15px', fontWeight: '600', cursor: 'pointer'
                 }}>Let&apos;s start →</button>
@@ -151,14 +151,14 @@ export default function AgentPage() {
                     placeholder="Student ID..."
                     autoFocus
                     style={{
-                      flex: 1, border: '2px solid #0F62FE', borderRadius: '8px',
+                      flex: 1, border: '2px solid #4A90C4', borderRadius: '8px',
                       padding: '10px 14px', fontSize: '15px', outline: 'none'
                     }}
                   />
                   <button
                     onClick={() => textInput.trim() && handleNext('studentId', textInput.trim())}
                     style={{
-                      backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
+                      backgroundColor: '#4A90C4', color: '#FFFFFF', border: 'none',
                       borderRadius: '8px', padding: '10px 20px', cursor: 'pointer', fontSize: '14px'
                     }}>Next →</button>
                 </div>
@@ -243,13 +243,13 @@ export default function AgentPage() {
 
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <button onClick={downloadSummary} style={{
-                    backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
+                    backgroundColor: '#4A90C4', color: '#FFFFFF', border: 'none',
                     borderRadius: '8px', padding: '12px 24px', cursor: 'pointer',
                     fontSize: '14px', fontWeight: '600'
                   }}>⬇ Download completed form</button>
                   <button onClick={() => router.push('/dashboard')} style={{
-                    backgroundColor: '#FFFFFF', color: '#0F62FE',
-                    border: '2px solid #0F62FE', borderRadius: '8px',
+                    backgroundColor: '#FFFFFF', color: '#4A90C4',
+                    border: '2px solid #4A90C4', borderRadius: '8px',
                     padding: '12px 24px', cursor: 'pointer', fontSize: '14px', fontWeight: '600'
                   }}>Back to Dashboard</button>
                 </div>

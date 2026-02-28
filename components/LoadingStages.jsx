@@ -31,11 +31,11 @@ export default function LoadingStages({ active }) {
       {/* Progress bar */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '3px', backgroundColor: '#F4F4F4' }}>
         <div style={{
-          height: '100%', backgroundColor: '#0F62FE',
+          height: '100%', backgroundColor: '#4A90C4',
           width: WIDTHS[stage], transition: 'width 800ms ease-in-out'
         }} />
       </div>
-      <p style={{ color: '#0F62FE', fontSize: '17px', fontWeight: 'bold', textAlign: 'center', padding: '0 32px' }}>
+      <p style={{ color: '#4A90C4', fontSize: '17px', fontWeight: 'bold', textAlign: 'center', padding: '0 32px' }}>
         {STAGES[stage]}
       </p>
     </div>

@@ -10,7 +10,7 @@ export default function AgentAlert({ alert, onAction }) {
         }
       `}</style>
       <div style={{
-        backgroundColor: '#0F62FE',
+        backgroundColor: '#4A90C4',
         color: '#FFFFFF',
         borderRadius: '8px',
         padding: '20px',
@@ -30,7 +30,7 @@ export default function AgentAlert({ alert, onAction }) {
           <button
             onClick={onAction}
             style={{
-              backgroundColor: '#FFFFFF', color: '#0F62FE',
+              backgroundColor: '#FFFFFF', color: '#4A90C4',
               fontWeight: 'bold', fontSize: '14px',
               border: 'none', borderRadius: '6px',
               padding: '8px 16px', cursor: 'pointer',
