@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 const PRIORITY_COLORS = {
   high: '#DA1E28',
-  medium: '#7D5A00', // darkened for AA contrast with white text
+  medium: '#7D5A00',
   low: '#198038'
 }
 
@@ -36,68 +36,83 @@ export default function TaskCard({ task, onComplete }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'var(--surface, #FFFFFF)',
         borderRadius: '8px',
+        border: `1px solid var(--border, #E0E0E0)`,
         borderLeft: `5px solid ${borderColor}`,
         padding: '16px',
         marginBottom: '12px',
-        boxShadow: hovered
-          ? '0 4px 16px rgba(0,0,0,0.12)'
-          : '0 2px 8px rgba(0,0,0,0.08)',
+        boxShadow: hovered ? '0 4px 16px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.06)',
         transform: hovered ? 'translateY(-2px)' : 'none',
         transition: 'transform 150ms ease, box-shadow 150ms ease',
         opacity: task.completed ? 0.5 : 1,
-        position: 'relative'
+        position: 'relative',
+        fontFamily: 'var(--font, IBM Plex Sans, sans-serif)',
       }}>
+
       {/* Checkbox */}
       <input
         type="checkbox"
         checked={!!task.completed}
         onChange={() => onComplete && onComplete(task.id)}
-        style={{ position: 'absolute', top: '16px', right: '16px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#0F62FE' }}
+        style={{
+          position: 'absolute', top: '16px', right: '16px',
+          width: '20px', height: '20px',
+          cursor: 'pointer', accentColor: 'var(--accent, #0F62FE)'
+        }}
       />
 
-      {/* Row 1: Title + Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', paddingRight: '28px', flexWrap: 'wrap' }}>
+      {/* Row 1: Title + Source + Priority badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', paddingRight: '32px', flexWrap: 'wrap' }}>
         <span style={{
-          fontWeight: 'bold', fontSize: '15px', color: '#161616',
+          fontWeight: 'bold',
+          fontSize: 'var(--fz-body, 15px)',
+          color: 'var(--text, #161616)',
+          lineHeight: 'var(--lh, 1.6)',
           textDecoration: task.completed ? 'line-through' : 'none'
         }}>{task.title}</span>
         {task.syllabusId && (
           <a href={`/syllabus/${task.syllabusId}`} style={{
-            fontSize: '11px', color: '#0F62FE', textDecoration: 'none',
-            backgroundColor: '#EDF5FF', padding: '2px 6px', borderRadius: '4px'
-          }}>
-            ↗ View Source
-          </a>
+            fontSize: 'var(--fz-small, 11px)',
+            color: 'var(--accent, #0F62FE)',
+            textDecoration: 'none',
+            backgroundColor: 'color-mix(in srgb, var(--accent, #0F62FE) 10%, transparent)',
+            padding: '2px 6px', borderRadius: '4px'
+          }}>↗ View Source</a>
         )}
         <span style={{
           marginLeft: 'auto',
           backgroundColor: borderColor, color: '#FFFFFF',
-          fontSize: '11px', borderRadius: '12px', padding: '2px 8px',
-          fontWeight: '600', whiteSpace: 'nowrap'
+          fontSize: 'var(--fz-small, 11px)', borderRadius: '12px',
+          padding: '2px 8px', fontWeight: '600', whiteSpace: 'nowrap'
         }}>{task.priority}</span>
       </div>
 
       {/* Row 2: Description */}
-      <p style={{ color: '#525252', fontSize: '15px', lineHeight: 1.65, margin: '0 0 10px 0' }}>
-        {task.plainEnglishDescription}
-      </p>
+      <p style={{
+        color: 'var(--subtext, #525252)',
+        fontSize: 'var(--fz-body, 15px)',
+        lineHeight: 'var(--lh, 1.65)',
+        margin: '0 0 10px 0'
+      }}>{task.plainEnglishDescription}</p>
 
-      {/* Row 3: Steps — animated collapse */}
+      {/* Row 3: Steps */}
       {task.steps && task.steps.length > 0 && (
         <div style={{ marginBottom: '10px' }}>
-          <button
-            onClick={() => setStepsOpen(o => !o)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0F62FE', fontSize: '13px', padding: 0 }}>
+          <button onClick={() => setStepsOpen(o => !o)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--accent, #0F62FE)',
+            fontSize: 'var(--fz-small, 13px)', padding: 0
+          }}>
             {stepsOpen ? '▾ Hide steps' : '▸ Show steps'}
           </button>
-          <div style={{
-            maxHeight: stepsOpen ? '500px' : '0',
-            overflow: 'hidden',
-            transition: 'max-height 300ms ease'
-          }}>
-            <ol style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#525252', fontSize: '14px', lineHeight: 1.5 }}>
+          <div style={{ maxHeight: stepsOpen ? '500px' : '0', overflow: 'hidden', transition: 'max-height 300ms ease' }}>
+            <ol style={{
+              margin: '8px 0 0 0', paddingLeft: '20px',
+              color: 'var(--subtext, #525252)',
+              fontSize: 'var(--fz-small, 14px)',
+              lineHeight: 'var(--lh, 1.5)'
+            }}>
               {task.steps.map((s, i) => <li key={i}>{s}</li>)}
             </ol>
           </div>
@@ -105,13 +120,12 @@ export default function TaskCard({ task, onComplete }) {
       )}
 
       {/* Row 4: Due date / confidence / time */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '13px', color: '#525252' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: 'var(--fz-small, 13px)', color: 'var(--subtext, #525252)' }}>
         <span>📅 {formatDueDate(task.dueDate)}</span>
         {task.confidence === 'low' && (
-          <span style={{
-            backgroundColor: '#FFF3CD', color: '#B28600',
-            fontSize: '12px', borderRadius: '4px', padding: '2px 8px'
-          }}>⚠ Verify this date</span>
+          <span style={{ backgroundColor: '#FFF3CD', color: '#B28600', fontSize: 'var(--fz-small, 12px)', borderRadius: '4px', padding: '2px 8px' }}>
+            ⚠ Verify this date
+          </span>
         )}
         {task.estimatedMinutes && (
           <span style={{ marginLeft: 'auto' }}>🕐 {formatTime(task.estimatedMinutes)}</span>
