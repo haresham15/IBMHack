@@ -1,10 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['pdf-parse', 'formidable', 'ibm-cos-sdk']
-  },
-  api: {
-    responseLimit: '10mb'
+    serverComponentsExternalPackages: ['pdf-parse', 'formidable', 'ibm-cos-sdk'],
+    serverActions: { bodySizeLimit: '10mb' }
   },
 
   // mapbox-gl v3 bundles its own worker inline but still references browser globals.

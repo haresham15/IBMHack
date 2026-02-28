@@ -23,11 +23,6 @@ const CAP_QUESTIONS = [
     type: 'text', options: null, values: null }
 ]
 
-const DEFAULT_CAP = {
-  displayName: 'Demo Student', informationDensity: 'moderate',
-  timeHorizon: '72h', supportLevel: 'step-by-step', sensoryFlags: [], sessionId: 'demo'
-}
-
 export default function OnboardingPage() {
   const router = useRouter()
   const [messages, setMessages] = useState([])
@@ -75,8 +70,8 @@ export default function OnboardingPage() {
         body: JSON.stringify({ answers: allAnswers })
       })
       if (!res.ok) throw new Error('API error ' + res.status)
-      const cap = await res.json()
-      localStorage.setItem('vantage_cap', JSON.stringify(cap.capProfile))
+      const data = await res.json()
+      if (data.error) throw new Error(data.message || 'Failed to save profile')
       const name = allAnswers.find(a => a.questionId === 'q5')?.answer || 'there'
       await addVantageMessage(`Perfect! I have saved your profile, ${name}. Your Vantage experience is ready.`)
       setTimeout(() => router.push('/dashboard'), 1200)
@@ -117,11 +112,6 @@ export default function OnboardingPage() {
       return q.options[idx]
     }).join(', ') : 'None'
     handleAnswer(values, displayText)
-  }
-
-  function handleSkip() {
-    localStorage.setItem('vantage_cap', JSON.stringify(DEFAULT_CAP))
-    router.push('/dashboard')
   }
 
   const currentQ = CAP_QUESTIONS[questionIndex]
@@ -187,7 +177,7 @@ export default function OnboardingPage() {
         {apiError && (
           <div style={{ width: '100%', maxWidth: '640px', padding: '0 16px 12px' }}>
             <div style={{ backgroundColor: '#FFF5F5', border: '1px solid #DA1E28', borderRadius: '8px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#DA1E28', fontSize: '14px' }}>❌ {apiError}</span>
+              <span style={{ color: '#DA1E28', fontSize: '14px' }}>&#x274C; {apiError}</span>
               <button onClick={() => { setApiError(null); submitCAP(retryAnswers) }} style={{
                 backgroundColor: '#DA1E28', color: '#FFFFFF', border: 'none',
                 borderRadius: '6px', padding: '6px 14px', cursor: 'pointer', fontSize: '13px'
@@ -236,13 +226,11 @@ export default function OnboardingPage() {
                     )
                   })}
                 </div>
-                {multiSelected.length > 0 && (
-                  <button onClick={handleMultiContinue} style={{
-                    backgroundColor: '#0F62FE', color: '#FFFFFF',
-                    border: 'none', borderRadius: '20px', padding: '10px 24px',
-                    cursor: 'pointer', fontSize: '14px', fontWeight: '600'
-                  }}>Continue →</button>
-                )}
+                <button onClick={handleMultiContinue} style={{
+                  backgroundColor: '#0F62FE', color: '#FFFFFF',
+                  border: 'none', borderRadius: '20px', padding: '10px 24px',
+                  cursor: 'pointer', fontSize: '14px', fontWeight: '600'
+                }}>Continue &#x2192;</button>
               </div>
             )}
 
@@ -261,18 +249,11 @@ export default function OnboardingPage() {
                   style={{
                     backgroundColor: '#0F62FE', color: '#FFFFFF', border: 'none',
                     borderRadius: '8px', padding: '10px 20px', cursor: 'pointer', fontSize: '14px'
-                  }}>Continue →</button>
+                  }}>Continue &#x2192;</button>
               </div>
             )}
           </div>
         )}
-
-        {/* Skip link */}
-        <button onClick={handleSkip} style={{
-          position: 'fixed', bottom: '16px', right: '20px',
-          background: 'none', border: 'none', color: '#525252',
-          fontSize: '12px', cursor: 'pointer', textDecoration: 'underline'
-        }}>Skip onboarding (demo)</button>
       </div>
     </>
   )

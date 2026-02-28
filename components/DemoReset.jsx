@@ -1,16 +1,18 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function DemoReset() {
   const router = useRouter()
   useEffect(() => {
-    function handleKey(e) {
+    async function handleKey(e) {
       if (e.ctrlKey && e.shiftKey && e.key === 'R') {
         e.preventDefault()
-        Object.keys(localStorage).filter(k => k.startsWith('vantage_')).forEach(k => localStorage.removeItem(k))
-        console.log('Demo reset — localStorage cleared')
-        router.push('/onboarding')
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        console.log('Demo reset — signed out')
+        router.push('/')
       }
     }
     window.addEventListener('keydown', handleKey)
