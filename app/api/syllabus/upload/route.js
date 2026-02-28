@@ -1,6 +1,10 @@
+import { join } from 'path'
+import { writeFileSync, mkdirSync } from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 import { syllabusStore } from '@/lib/session-store'
 import { uploadToCOS } from '@/lib/cos'
+
+const PDF_CACHE_DIR = join(process.cwd(), 'cache', 'pdfs')
 
 export async function POST(request) {
   // Parse FormData
@@ -69,6 +73,15 @@ export async function POST(request) {
     buffer,
     uploadedAt: new Date().toISOString()
   })
+
+  // Persist PDF to disk so the original route can serve it after server restarts
+  try {
+    mkdirSync(PDF_CACHE_DIR, { recursive: true })
+    writeFileSync(join(PDF_CACHE_DIR, `${syllabusId}.pdf`), buffer)
+    writeFileSync(join(PDF_CACHE_DIR, `${syllabusId}.meta`), filename)
+  } catch (err) {
+    console.warn('[upload] Disk cache write failed:', err.message)
+  }
 
   // Fire-and-forget COS upload — errors only warn, never fail the request
   uploadToCOS(buffer, `${syllabusId}-${filename}`).catch(err => {

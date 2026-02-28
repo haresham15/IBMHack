@@ -110,6 +110,13 @@ export default function UploadPage() {
 
     if (sylErr) throw new Error('db_error')
 
+    // Link Supabase row ID → upload PDF so "View Original PDF" works
+    fetch('/api/syllabus/link-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ supabaseId: sylRow.id, syllabusId })
+    }).catch(() => {})
+
     const taskRows = result.tasks.map(t => ({
       syllabus_id: sylRow.id,
       user_id: user.id,
