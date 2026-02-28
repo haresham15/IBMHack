@@ -80,13 +80,6 @@ export default function Navbar({ showNav = true }) {
         {/* ── Wordmark + tagline ── */}
         <Link href="/" style={{ display: 'flex', alignItems: 'baseline', gap: '10px', textDecoration: 'none' }}>
           <span className="vantage-wordmark">Vantage</span>
-          <span style={{
-            fontSize: '11px', fontWeight: '500', letterSpacing: '.06em',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)',
-            fontFamily: 'IBM Plex Sans, sans-serif',
-          }}>
-            AI · OSU
-          </span>
         </Link>
 
         {/* ── Nav links ── */}

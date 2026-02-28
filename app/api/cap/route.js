@@ -42,15 +42,25 @@ export async function POST(request) {
     )
   }
 
-  const { error: dbError } = await supabase.from('cap_profiles').upsert({
+  const baseProfile = {
     user_id: user.id,
     display_name: capResult.displayName,
     information_density: capResult.informationDensity,
     time_horizon: capResult.timeHorizon,
     sensory_flags: capResult.sensoryFlags,
     support_level: capResult.supportLevel,
-    disorders: capResult.disorders ?? []
-  }, { onConflict: 'user_id' })
+  }
+
+  let { error: dbError } = await supabase.from('cap_profiles').upsert(
+    { ...baseProfile, disorders: capResult.disorders ?? [] },
+    { onConflict: 'user_id' }
+  )
+
+  // If disorders column doesn't exist, retry without it
+  if (dbError?.message?.includes('disorders')) {
+    const retry = await supabase.from('cap_profiles').upsert(baseProfile, { onConflict: 'user_id' })
+    dbError = retry.error
+  }
 
   if (dbError) {
     return Response.json(

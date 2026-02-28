@@ -119,6 +119,20 @@ export default function DashboardPage() {
     await supabase.from('tasks').update({ completed: next }).eq('id', id)
   }
 
+  async function handleDeleteCourse(syllabusId) {
+    if (!confirm('Delete this course and all its tasks? This cannot be undone.')) return
+    const supabase = createClient()
+    await supabase.from('tasks').delete().eq('syllabus_id', syllabusId)
+    await supabase.from('syllabi').delete().eq('id', syllabusId)
+    setSyllabi(prev => prev.filter(s => s.id !== syllabusId))
+    setTasks(prev => prev.filter(t => t.syllabusId !== syllabusId))
+    setActiveTab(prev => {
+      if (prev !== syllabusId) return prev
+      const remaining = syllabi.filter(s => s.id !== syllabusId)
+      return remaining.length > 0 ? remaining[0].id : null
+    })
+  }
+
   async function handleSignOut() {
     const supabase = createClient()
     await supabase.auth.signOut()
@@ -208,11 +222,24 @@ export default function DashboardPage() {
               overflowX: 'auto', display: 'flex', alignItems: 'stretch', paddingLeft: '16px'
             }}>
               {syllabi.map(s => (
-                <button key={s.id}
-                  className={`course-tab${activeTab === s.id ? ' active-tab' : ''}`}
-                  onClick={() => setActiveTab(s.id)}>
-                  {s.courseName}
-                </button>
+                <div key={s.id} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
+                  onMouseEnter={e => { const x = e.currentTarget.querySelector('.delete-tab'); if (x) x.style.opacity = '1' }}
+                  onMouseLeave={e => { const x = e.currentTarget.querySelector('.delete-tab'); if (x) x.style.opacity = '0' }}
+                >
+                  <button
+                    className={`course-tab${activeTab === s.id ? ' active-tab' : ''}`}
+                    onClick={() => setActiveTab(s.id)}
+                    style={{ paddingRight: '28px' }}>
+                    {s.courseName}
+                  </button>
+                  <button className="delete-tab" onClick={e => { e.stopPropagation(); handleDeleteCourse(s.id) }} style={{
+                    position: 'absolute', right: '6px',
+                    opacity: 0, transition: 'opacity 150ms',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'var(--subtext)', fontSize: '14px', lineHeight: 1,
+                    padding: '2px 4px', borderRadius: '4px',
+                  }}>×</button>
+                </div>
               ))}
               <button className="course-tab"
                 onClick={() => router.push('/upload')}
