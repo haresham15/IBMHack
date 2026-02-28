@@ -25,7 +25,7 @@ export default function Navbar({ showNav = true }) {
           100% { background-position:  200% center; }
         }
         .vantage-wordmark {
-          background: linear-gradient(90deg, #ffffff 0%, #93c5fd 40%, #ffffff 60%, #93c5fd 100%);
+          background: linear-gradient(90deg, #ffffff 0%, #DAEEFB 40%, #ffffff 60%, #DAEEFB 100%);
           background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -70,10 +70,10 @@ export default function Navbar({ showNav = true }) {
         position: 'fixed', top: 0, left: 0, right: 0, height: '52px',
         zIndex: 200,
         /* Frosted glass dark bar */
-        background: 'linear-gradient(90deg, #0c1442 0%, #0f172a 50%, #0c1442 100%)',
+        background: 'linear-gradient(90deg, #3a85b8 0%, #5BAACF 50%, #3a85b8 100%)',
         backdropFilter: 'blur(16px) saturate(180%)',
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-        boxShadow: '0 1px 0 rgba(255,255,255,0.06), 0 4px 24px rgba(0,0,0,0.35)',
+        boxShadow: '0 1px 0 rgba(255,255,255,0.2), 0 4px 24px rgba(26,58,82,0.2)',
         display: 'flex', alignItems: 'center',
         justifyContent: 'space-between', padding: '0 20px 0 24px',
       }}>
