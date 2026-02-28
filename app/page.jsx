@@ -1,7 +1,29 @@
 'use client'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+const FEATURE_DETAILS = {
+  'Syllabus → Tasks': {
+    icon: '📄',
+    desc: 'Upload any course syllabus PDF and Vantage instantly extracts every assignment, exam, and deadline — turning them into a prioritised, personalised task list powered by IBM Granite.'
+  },
+  'Neurodivergent-first': {
+    icon: '🧠',
+    desc: 'Vantage adapts its colours, fonts, layout density, and motion to suit how your brain works best — whether you have ADHD, dyslexia, ASD, anxiety, or sensory sensitivities.'
+  },
+  'Campus Map': {
+    icon: '🗺️',
+    desc: 'Find buildings, classrooms, dining halls, and accessibility routes across campus. Tap any location to get directions and see opening hours.'
+  },
+  'Priority Engine': {
+    icon: '🎯',
+    desc: 'Tasks are ranked by due date, estimated effort, and your personal time horizon — so you always know what to focus on next without getting overwhelmed.'
+  },
+}
+
 export default function Home() {
+  const [openPill, setOpenPill] = useState(null)
+
   async function signInWithGoogle() {
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
@@ -71,23 +93,50 @@ export default function Home() {
 
           {/* Feature pills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-            {[
-              { icon: '📄', label: 'Syllabus → Tasks' },
-              { icon: '🧠', label: 'Neurodivergent-first' },
-              { icon: '🗺️', label: 'Campus Map' },
-              { icon: '🎯', label: 'Priority Engine' },
-            ].map(({ icon, label }) => (
-              <div key={label} style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                backgroundColor: 'rgba(255,255,255,0.35)',
-                border: '1px solid rgba(255,255,255,0.6)',
-                borderRadius: '8px', padding: '6px 14px',
-                fontSize: '13px', color: '#1A3A52'
-              }}>
-                <span>{icon}</span><span>{label}</span>
-              </div>
-            ))}
+            {Object.entries(FEATURE_DETAILS).map(([label, { icon }]) => {
+              const isOpen = openPill === label
+              return (
+                <div key={label} style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setOpenPill(isOpen ? null : label)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '6px',
+                      backgroundColor: isOpen ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.35)',
+                      border: `1px solid ${isOpen ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)'}`,
+                      borderRadius: '8px', padding: '6px 14px',
+                      fontSize: '13px', color: '#1A3A52',
+                      cursor: 'pointer', transition: 'all 150ms',
+                      boxShadow: isOpen ? '0 2px 12px rgba(26,58,82,0.12)' : 'none',
+                      fontFamily: 'IBM Plex Sans, sans-serif', fontWeight: isOpen ? '600' : '400'
+                    }}
+                    onMouseEnter={e => { if (!isOpen) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.55)' }}
+                    onMouseLeave={e => { if (!isOpen) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.35)' }}
+                  >
+                    <span>{icon}</span><span>{label}</span>
+                  </button>
+
+                  {isOpen && (
+                    <div style={{
+                      position: 'absolute', top: 'calc(100% + 8px)', left: 0,
+                      width: '260px', zIndex: 10,
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '10px', padding: '14px 16px',
+                      boxShadow: '0 8px 32px rgba(26,58,82,0.18)',
+                      border: '1px solid rgba(255,255,255,0.8)',
+                      fontSize: '13px', color: '#1A3A52', lineHeight: 1.55,
+                      animation: 'pillFadeIn 150ms ease'
+                    }}>
+                      <div style={{ fontWeight: '700', marginBottom: '6px', fontSize: '14px' }}>
+                        {icon} {label}
+                      </div>
+                      {FEATURE_DETAILS[label].desc}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
+          <style>{`@keyframes pillFadeIn { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:none } }`}</style>
         </div>
 
         {/* Right: sign-in card */}

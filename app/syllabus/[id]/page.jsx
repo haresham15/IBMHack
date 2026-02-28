@@ -122,20 +122,20 @@ export default function SyllabusPage() {
       <div style={{ paddingTop: '48px', fontFamily: 'IBM Plex Sans, sans-serif', minHeight: '100vh', backgroundColor: '#F4F4F4' }}>
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #A8D8EA, #4A90C4)',
+          background: 'linear-gradient(180deg, #3a85b8 0%, #DAEEFB 100%)',
           padding: '28px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
         }}>
           <div>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1A3A52' }}>
+            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#FFFFFF' }}>
               {syllabus?.courseName || 'Course Syllabus'}
             </div>
-            <div style={{ fontSize: '14px', color: '#2471A3', marginTop: '4px' }}>
+            <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', marginTop: '4px' }}>
               {syllabus?.instructor} {syllabus?.term ? `• ${syllabus.term}` : ''}
             </div>
           </div>
           <a href={`/api/syllabus/${id}/original`} target="_blank" rel="noreferrer"
             style={{
-              backgroundColor: '#FFFFFF', color: '#4A90C4',
+              backgroundColor: 'rgba(255,255,255,0.9)', color: '#3a85b8',
               border: 'none', borderRadius: '6px', padding: '8px 16px',
               fontSize: '14px', fontWeight: '600', textDecoration: 'none',
               display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap'
