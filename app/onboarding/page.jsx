@@ -155,7 +155,18 @@ export default function OnboardingPage() {
         position: 'relative'
       }}>
         {/* Header */}
-        <div style={{ padding: '32px 24px 16px', textAlign: 'center' }}>
+        <div style={{ padding: '32px 24px 16px', textAlign: 'center', position: 'relative' }}>
+          <button onClick={() => router.back()} style={{
+            position: 'absolute', left: '24px', top: '36px',
+            background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '8px', padding: '6px 14px', color: '#FFFFFF',
+            fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px',
+            transition: 'background 150ms'
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+          >← Back</button>
           <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#FFFFFF' }}>Vantage</div>
           <div style={{ fontSize: '15px', color: '#F4F4F4', marginTop: '4px' }}>
             Let us learn how your brain works best.
