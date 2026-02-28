@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/campus-map', label: 'Campus Map' },
   { href: '/upload', label: 'Syllabi' },
+  { href: '/financial-aid', label: 'Financial Aid' },
   { href: '/onboarding', label: 'My Profile' },
 ]
 
